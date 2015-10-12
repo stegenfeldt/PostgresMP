@@ -1,0 +1,611 @@
+﻿<?xml version="1.0" encoding="utf-8"?><ManagementPack ContentReadable="true" SchemaVersion="2.0" OriginalSchemaVersion="1.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <Manifest>
+    <Identity>
+      <ID>PostgreSQLMP</ID>
+      <Version>1.0.0.0</Version>
+    </Identity>
+    <Name>PostgreSQLMP</Name>
+    <References>
+      <Reference Alias="SCInternal">
+        <ID>Microsoft.SystemCenter.Internal</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Windows">
+        <ID>Microsoft.Windows.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SystemPerf">
+        <ID>System.Performance.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="System">
+        <ID>System.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SC">
+        <ID>Microsoft.SystemCenter.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SystemHealth">
+        <ID>System.Health.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+    </References>
+  </Manifest>
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+        <ClassType ID="Postgres.TargetComputer" Comment="targetComputer comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.Computer" Hosted="false" Singleton="false" Extension="false">
+          <Property ID="Version" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+        <ClassType ID="Postgres.dataBase" Comment="database comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="false" Singleton="false" Extension="false">
+          <Property ID="Dbname" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="hostName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+      </ClassTypes>
+    </EntityTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Discoveries>
+      <Discovery ID="PostgreSQLMP.ComputerDiscovery" Comment="ComputerDiscovery comment" Enabled="true" Target="Windows!Microsoft.Windows.Computer" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="Postgres.TargetComputer" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.DiscoveryProvider">
+          <IntervalSeconds>120</IntervalSeconds>
+          <SyncTime />
+          <ScriptName>PostgresComputerDiscovery.vbs</ScriptName>
+          <Arguments>$MPElement$ $Target/Id$ $Target/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Arguments>
+          <ScriptBody>
+			Option Explicit
+			
+			Dim SourceId, ManagedEntityId, sComputerName
+			SourceId = WScript.Arguments(0) 
+			ManagedEntityId = WScript.Arguments(1)
+			sComputerName = WScript.Arguments(2)
+			
+			Dim oAPI
+			Set oAPI = CreateObject("MOM.ScriptAPI")
+			Dim oDiscoveryData
+			Set oDiscoveryData = oAPI.CreateDiscoveryData(0, SourceId, ManagedEntityId)
+		  
+			Dim oShell, entry
+			On Error Resume Next
+			
+			Set oShell = CreateObject("WScript.Shell")
+			entry = oShell.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\PostgreSQL\Installations\")
+			If Err.Number Then
+				'Err.Clear
+				'Wscript.Quit -1
+				'RegKeyExists = False
+			Else
+				Err.Clear
+				Dim conn
+				Set conn= CreateObject("ADODB.Connection")
+				conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
+				Dim version
+
+				Dim rs
+				Set rs = CreateObject("ADODB.recordset")
+				'---&gt;db version
+				rs.Open "Select version()", conn
+				 
+				do until rs.EOF
+				  version = rs.Fields(0).value
+				  rs.MoveNext
+				loop
+				rs.close
+				
+				Dim oInstance
+				Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='Postgres.TargetComputer']$")
+				Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
+				Call oInstance.AddProperty("$MPElement[Name='Postgres.TargetComputer']/Version$", version) 
+				Call oDiscoveryData.AddInstance(oInstance)
+		
+				conn.Close
+			End If
+			Call oAPI.Return(oDiscoveryData)
+			</ScriptBody>
+          <TimeoutSeconds>300</TimeoutSeconds>
+        </DataSource>
+      </Discovery>
+      <Discovery ID="PostgreSQLMP.dbDiscovery" Comment="dbDiscovery comment" Enabled="true" Target="Postgres.TargetComputer" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="Postgres.dataBase" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.DiscoveryProvider">
+          <IntervalSeconds>120</IntervalSeconds>
+          <SyncTime />
+          <ScriptName>PostgresdbDiscovery.vbs</ScriptName>
+          <Arguments>$MPElement$ $Target/Id$ $Target/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Arguments>
+          <ScriptBody>
+			Option Explicit
+			
+			Dim SourceId, ManagedEntityId, sComputerName
+			SourceId = WScript.Arguments(0) 
+			ManagedEntityId = WScript.Arguments(1)
+			sComputerName = WScript.Arguments(2)
+			
+			Dim oAPI
+			Set oAPI = CreateObject("MOM.ScriptAPI")
+			Dim oDiscoveryData
+			Set oDiscoveryData = oAPI.CreateDiscoveryData(0, SourceId, ManagedEntityId)
+		  
+			On Error Resume Next
+			
+			
+				Dim conn
+				Set conn= CreateObject("ADODB.Connection")
+				conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
+				Dim version
+
+				Dim rs
+				Set rs = CreateObject("ADODB.recordset")
+				'---&gt;db version
+				rs.Open "SELECT pg_database.datname as " &amp; Chr(34) &amp; " Database"&amp;Chr(34)&amp;" FROM pg_database", conn
+				 
+				do until rs.EOF
+				  version = rs.Fields(0).value
+				  Dim oInstance
+				  Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='Postgres.dataBase']$")
+				  'Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", version)
+				  Call oInstance.AddProperty("$MPElement[Name='Postgres.dataBase']/Dbname$", version) 
+				  Call oInstance.AddProperty("$MPElement[Name='Postgres.dataBase']/hostName$", sComputerName) 
+				  Call oDiscoveryData.AddInstance(oInstance)
+				  rs.MoveNext
+				loop
+				rs.close
+				
+				
+		
+				conn.Close
+			Call oAPI.Return(oDiscoveryData)
+			</ScriptBody>
+          <TimeoutSeconds>300</TimeoutSeconds>
+        </DataSource>
+      </Discovery>
+    </Discoveries>
+    <Monitors>
+      <UnitMonitor ID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9" Accessibility="Public" Enabled="true" Target="Postgres.dataBase" ParentMonitorID="SystemHealth!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.TwoStateMonitorType" ConfirmDelivery="false">
+        <Category>Custom</Category>
+        <OperationalStates>
+          <OperationalState ID="UIGeneratedOpStateIdf68384b05cad46a495310e6efc3b3894" MonitorTypeStateID="Error" HealthState="Warning" />
+          <OperationalState ID="UIGeneratedOpStateId4fc4d86847bf49889af030e77d1ac122" MonitorTypeStateID="Success" HealthState="Success" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>60</IntervalSeconds>
+          <SyncTime />
+          <ScriptName>dbScriptTest.vbs</ScriptName>
+          <Arguments />
+          <ScriptBody>' Enter a script that outputs a property bag
+' Example VBScript:
+'
+Dim oAPI, oBag
+Set oAPI = CreateObject("MOM.ScriptAPI")
+Set oBag = oAPI.CreatePropertyBag()
+Call oBag.AddValue("State","OK")
+Call oAPI.Return(oBag)
+                            </ScriptBody>
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <ErrorExpression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Property[@Name='State']</XPathQuery>
+              </ValueExpression>
+              <Operator>NotEqual</Operator>
+              <ValueExpression>
+                <Value Type="String">OK</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </ErrorExpression>
+          <SuccessExpression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Property[@Name='State']</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="String">OK</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </SuccessExpression>
+        </Configuration>
+      </UnitMonitor>
+    </Monitors>
+  </Monitoring>
+  <Presentation>
+    <Views>
+      <View ID="View_640b57e7041d45f38979f3f7faed524c" Accessibility="Public" Enabled="true" Target="Postgres.TargetComputer" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <InMaintenanceMode>false</InMaintenanceMode>
+        </Criteria>
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>State</Name>
+            <Id>Postgres.TargetComputer-*-f006fb88-eff1-5713-eb0f-dd5aed23a376-*-Health</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>In Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>System.Entity/DisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Principal Name</Name>
+            <Id>Microsoft.Windows.Computer/PrincipalName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DNS Name</Name>
+            <Id>Microsoft.Windows.Computer/DNSName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="7" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>NetBIOS Computer Name</Name>
+            <Id>Microsoft.Windows.Computer/NetbiosComputerName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="8" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>NetBIOS Domain Name</Name>
+            <Id>Microsoft.Windows.Computer/NetbiosDomainName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="9" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>IP Address</Name>
+            <Id>Microsoft.Windows.Computer/IPAddress</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="10" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Network Name</Name>
+            <Id>Microsoft.Windows.Computer/NetworkName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="11" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Active Directory SID</Name>
+            <Id>Microsoft.Windows.Computer/ActiveDirectoryObjectSid</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="12" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="false" Visible="false" SortOrder="Ascending">
+            <Name>Virtual Machine</Name>
+            <Id>Microsoft.Windows.Computer/IsVirtualMachine</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="13" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DNS Domain Name</Name>
+            <Id>Microsoft.Windows.Computer/DomainDnsName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="14" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Organizational Unit</Name>
+            <Id>Microsoft.Windows.Computer/OrganizationalUnit</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="15" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DNS Forest Name</Name>
+            <Id>Microsoft.Windows.Computer/ForestDnsName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="16" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Active Directory Site</Name>
+            <Id>Microsoft.Windows.Computer/ActiveDirectorySite</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="17" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Logical Processors</Name>
+            <Id>Microsoft.Windows.Computer/LogicalProcessors</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="18" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Physical Processors</Name>
+            <Id>Microsoft.Windows.Computer/PhysicalProcessors</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="19" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Host Server Name</Name>
+            <Id>Microsoft.Windows.Computer/HostServerName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="20" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Virtual Machine Name</Name>
+            <Id>Microsoft.Windows.Computer/VirtualMachineName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="21" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Offset In Minutes From Greenwich Time</Name>
+            <Id>Microsoft.Windows.Computer/OffsetInMinuteFromGreenwichTime</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="22" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="false" Visible="false" SortOrder="Ascending">
+            <Name>Last Inventory Date</Name>
+            <Id>Microsoft.Windows.Computer/LastInventoryDate</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="23" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Version</Name>
+            <Id>Postgres.TargetComputer/Version</Id>
+          </ColumnInfo>
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_dc2c773d3468454f98df15b2911d701e" Accessibility="Public" Enabled="true" Target="Postgres.TargetComputer" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <InMaintenanceMode>false</InMaintenanceMode>
+        </Criteria>
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>State</Name>
+            <Id>Postgres.TargetComputer-*-4e13091d-2212-3431-d51c-c44fa8928838-*-Health</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>In Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>System.Entity/DisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Principal Name</Name>
+            <Id>Microsoft.Windows.Computer/PrincipalName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DNS Name</Name>
+            <Id>Microsoft.Windows.Computer/DNSName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="7" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>NetBIOS Computer Name</Name>
+            <Id>Microsoft.Windows.Computer/NetbiosComputerName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="8" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>NetBIOS Domain Name</Name>
+            <Id>Microsoft.Windows.Computer/NetbiosDomainName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="9" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>IP Address</Name>
+            <Id>Microsoft.Windows.Computer/IPAddress</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="10" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Network Name</Name>
+            <Id>Microsoft.Windows.Computer/NetworkName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="11" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Active Directory SID</Name>
+            <Id>Microsoft.Windows.Computer/ActiveDirectoryObjectSid</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="12" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="false" Visible="false" SortOrder="Ascending">
+            <Name>Virtual Machine</Name>
+            <Id>Microsoft.Windows.Computer/IsVirtualMachine</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="13" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DNS Domain Name</Name>
+            <Id>Microsoft.Windows.Computer/DomainDnsName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="14" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Organizational Unit</Name>
+            <Id>Microsoft.Windows.Computer/OrganizationalUnit</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="15" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DNS Forest Name</Name>
+            <Id>Microsoft.Windows.Computer/ForestDnsName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="16" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Active Directory Site</Name>
+            <Id>Microsoft.Windows.Computer/ActiveDirectorySite</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="17" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Logical Processors</Name>
+            <Id>Microsoft.Windows.Computer/LogicalProcessors</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="18" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Physical Processors</Name>
+            <Id>Microsoft.Windows.Computer/PhysicalProcessors</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="19" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Host Server Name</Name>
+            <Id>Microsoft.Windows.Computer/HostServerName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="20" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Virtual Machine Name</Name>
+            <Id>Microsoft.Windows.Computer/VirtualMachineName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="21" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Offset In Minutes From Greenwich Time</Name>
+            <Id>Microsoft.Windows.Computer/OffsetInMinuteFromGreenwichTime</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="22" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="false" Visible="false" SortOrder="Ascending">
+            <Name>Last Inventory Date</Name>
+            <Id>Microsoft.Windows.Computer/LastInventoryDate</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="23" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Version</Name>
+            <Id>Postgres.TargetComputer/Version</Id>
+          </ColumnInfo>
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_d0f8602482e547cfaeffcdabecb8244e" Accessibility="Public" Enabled="true" Target="Postgres.dataBase" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <InMaintenanceMode>false</InMaintenanceMode>
+        </Criteria>
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>State</Name>
+            <Id>Postgres.dataBase-*-acc2faa9-eb6c-4b8d-5038-4d5e843b3f5a-*-Health</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>In Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>System.Entity/DisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Principal Name</Name>
+            <Id>Microsoft.Windows.Computer/PrincipalName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DNS Name</Name>
+            <Id>Microsoft.Windows.Computer/DNSName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="7" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>NetBIOS Computer Name</Name>
+            <Id>Microsoft.Windows.Computer/NetbiosComputerName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="8" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>NetBIOS Domain Name</Name>
+            <Id>Microsoft.Windows.Computer/NetbiosDomainName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="9" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>IP Address</Name>
+            <Id>Microsoft.Windows.Computer/IPAddress</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="10" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Network Name</Name>
+            <Id>Microsoft.Windows.Computer/NetworkName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="11" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Active Directory SID</Name>
+            <Id>Microsoft.Windows.Computer/ActiveDirectoryObjectSid</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="12" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="false" Visible="false" SortOrder="Ascending">
+            <Name>Virtual Machine</Name>
+            <Id>Microsoft.Windows.Computer/IsVirtualMachine</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="13" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DNS Domain Name</Name>
+            <Id>Microsoft.Windows.Computer/DomainDnsName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="14" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Organizational Unit</Name>
+            <Id>Microsoft.Windows.Computer/OrganizationalUnit</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="15" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DNS Forest Name</Name>
+            <Id>Microsoft.Windows.Computer/ForestDnsName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="16" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Active Directory Site</Name>
+            <Id>Microsoft.Windows.Computer/ActiveDirectorySite</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="17" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Logical Processors</Name>
+            <Id>Microsoft.Windows.Computer/LogicalProcessors</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="18" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Physical Processors</Name>
+            <Id>Microsoft.Windows.Computer/PhysicalProcessors</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="19" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Host Server Name</Name>
+            <Id>Microsoft.Windows.Computer/HostServerName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="20" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Virtual Machine Name</Name>
+            <Id>Microsoft.Windows.Computer/VirtualMachineName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="21" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Offset In Minutes From Greenwich Time</Name>
+            <Id>Microsoft.Windows.Computer/OffsetInMinuteFromGreenwichTime</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="22" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="false" Visible="false" SortOrder="Ascending">
+            <Name>Last Inventory Date</Name>
+            <Id>Microsoft.Windows.Computer/LastInventoryDate</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="23" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Dbname</Name>
+            <Id>Postgres.dataBase/Dbname</Id>
+          </ColumnInfo>
+        </Presentation>
+        <Target />
+      </View>
+    </Views>
+    <Folders>
+      <Folder ID="Folder_44dcd909385f4e21add332977bb8fc57" Accessibility="Public" ParentFolder="SC!Microsoft.SystemCenter.Monitoring.ViewFolder.Root" />
+    </Folders>
+    <FolderItems>
+      <FolderItem ElementID="View_dc2c773d3468454f98df15b2911d701e" ID="i170ca6dfc15d44f5a2d4ff92b943c90a" Folder="Folder_44dcd909385f4e21add332977bb8fc57" />
+      <FolderItem ElementID="View_d0f8602482e547cfaeffcdabecb8244e" ID="i33130bfcafbd4e9086bc33eae7c11fe1" Folder="Folder_44dcd909385f4e21add332977bb8fc57" />
+    </FolderItems>
+  </Presentation>
+  <LanguagePacks>
+    <LanguagePack ID="RUS" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="PostgreSQLMP">
+          <Name>PostgreSQLMP</Name>
+          <Description>ManagePack comment</Description>
+        </DisplayString>
+        <DisplayString ElementID="Postgres.TargetComputer">
+          <Name>Postgres TargetComputer</Name>
+          <Description>Target Computer Descripton</Description>
+        </DisplayString>
+        <DisplayString ElementID="Postgres.dataBase">
+          <Name>Postgres dataBase</Name>
+          <Description>dataBase Descripton</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgreSQLMP.dbDiscovery">
+          <Name>PostgreSQLMP dbDiscovery</Name>
+          <Description>dbDiscovery Description</Description>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+    <LanguagePack ID="ENU" IsDefault="false">
+      <DisplayStrings>
+        <DisplayString ElementID="PostgreSQLMP">
+          <Name>PostgreSQLMP</Name>
+          <Description>ManagePack comment</Description>
+        </DisplayString>
+        <DisplayString ElementID="Postgres.TargetComputer">
+          <Name>Postgres TargetComputer</Name>
+          <Description>Target Computer Descripton</Description>
+        </DisplayString>
+        <DisplayString ElementID="Postgres.dataBase">
+          <Name>Postgres dataBase</Name>
+          <Description>dataBase Descripton</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgreSQLMP.dbDiscovery">
+          <Name>PostgreSQLMP dbDiscovery</Name>
+          <Description>dbDiscovery Description</Description>
+        </DisplayString>
+        <DisplayString ElementID="Folder_44dcd909385f4e21add332977bb8fc57">
+          <Name>Postgres</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_dc2c773d3468454f98df15b2911d701e">
+          <Name>computers</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_d0f8602482e547cfaeffcdabecb8244e">
+          <Name>db</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9">
+          <Name>testdb</Name>
+          <Description />
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9" SubElementID="UIGeneratedOpStateIdf68384b05cad46a495310e6efc3b3894">
+          <Name>Unhealthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9" SubElementID="UIGeneratedOpStateId4fc4d86847bf49889af030e77d1ac122">
+          <Name>Healthy</Name>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPack>
