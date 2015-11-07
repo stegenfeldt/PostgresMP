@@ -2,7 +2,7 @@
   <Manifest>
     <Identity>
       <ID>PostgreSQLMP</ID>
-      <Version>1.0.0.0</Version>
+      <Version>1.0.0.1</Version>
     </Identity>
     <Name>PostgreSQLMP</Name>
     <References>
@@ -44,11 +44,20 @@
         <ClassType ID="Postgres.TargetComputer" Comment="targetComputer comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.Computer" Hosted="false" Singleton="false" Extension="false">
           <Property ID="Version" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
-        <ClassType ID="Postgres.dataBase" Comment="database comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="false" Singleton="false" Extension="false">
+		<ClassType ID="Postgres.Application" Comment="Application comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.LocalApplication" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="Info" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+        <ClassType ID="Postgres.dataBase" Comment="database comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
           <Property ID="Dbname" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
           <Property ID="hostName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
       </ClassTypes>
+	  <RelationshipTypes>
+        <RelationshipType ID="ApplHostsApplicationComponent" Base="System!System.Hosting" Accessibility="Public">
+          <Source ID="Application" Type="Postgres.Application"/>
+          <Target ID="ApplicationComponent" Type="Postgres.dataBase"/>
+        </RelationshipType>
+      </RelationshipTypes>
     </EntityTypes>
   </TypeDefinitions>
   <Monitoring>
@@ -56,10 +65,11 @@
       <Discovery ID="PostgreSQLMP.ComputerDiscovery" Comment="ComputerDiscovery comment" Enabled="true" Target="Windows!Microsoft.Windows.Computer" ConfirmDelivery="false" Remotable="true" Priority="Normal">
         <Category>Discovery</Category>
         <DiscoveryTypes>
-          <DiscoveryClass TypeID="Postgres.TargetComputer" />
+          <!-- <DiscoveryClass TypeID="Postgres.TargetComputer" /> -->
+		  <DiscoveryClass TypeID="Postgres.Application" />
         </DiscoveryTypes>
         <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.DiscoveryProvider">
-          <IntervalSeconds>120</IntervalSeconds>
+          <IntervalSeconds>360</IntervalSeconds>
           <SyncTime />
           <ScriptName>PostgresComputerDiscovery.vbs</ScriptName>
           <Arguments>$MPElement$ $Target/Id$ $Target/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Arguments>
@@ -104,11 +114,14 @@
 				rs.close
 				
 				Dim oInstance
-				Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='Postgres.TargetComputer']$")
+				'Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='Postgres.TargetComputer']$")
+				'Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
+				'Call oInstance.AddProperty("$MPElement[Name='Postgres.TargetComputer']/Version$", version) 
+				'Call oDiscoveryData.AddInstance(oInstance)
+				Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='Postgres.Application']$")
 				Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
-				Call oInstance.AddProperty("$MPElement[Name='Postgres.TargetComputer']/Version$", version) 
+				Call oInstance.AddProperty("$MPElement[Name='Postgres.Application']/Info$", version)
 				Call oDiscoveryData.AddInstance(oInstance)
-		
 				conn.Close
 			End If
 			Call oAPI.Return(oDiscoveryData)
@@ -116,16 +129,16 @@
           <TimeoutSeconds>300</TimeoutSeconds>
         </DataSource>
       </Discovery>
-      <Discovery ID="PostgreSQLMP.dbDiscovery" Comment="dbDiscovery comment" Enabled="true" Target="Postgres.TargetComputer" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+      <Discovery ID="PostgreSQLMP.dbDiscovery" Enabled="true" Target="Postgres.Application" ConfirmDelivery="false" Remotable="true" Priority="Normal">
         <Category>Discovery</Category>
         <DiscoveryTypes>
           <DiscoveryClass TypeID="Postgres.dataBase" />
         </DiscoveryTypes>
         <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.DiscoveryProvider">
-          <IntervalSeconds>120</IntervalSeconds>
+          <IntervalSeconds>300</IntervalSeconds>
           <SyncTime />
           <ScriptName>PostgresdbDiscovery.vbs</ScriptName>
-          <Arguments>$MPElement$ $Target/Id$ $Target/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Arguments>
+          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Arguments>
           <ScriptBody>
 			Option Explicit
 			
@@ -156,9 +169,10 @@
 				  version = rs.Fields(0).value
 				  Dim oInstance
 				  Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='Postgres.dataBase']$")
-				  'Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", version)
+				  Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
 				  Call oInstance.AddProperty("$MPElement[Name='Postgres.dataBase']/Dbname$", version) 
 				  Call oInstance.AddProperty("$MPElement[Name='Postgres.dataBase']/hostName$", sComputerName) 
+				  Call oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", version) 
 				  Call oDiscoveryData.AddInstance(oInstance)
 				  rs.MoveNext
 				loop
