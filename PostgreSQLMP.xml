@@ -44,32 +44,39 @@
         <ClassType ID="Postgres.TargetComputer" Comment="targetComputer comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.Computer" Hosted="false" Singleton="false" Extension="false">
           <Property ID="Version" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
-		<ClassType ID="Postgres.Application" Comment="Application comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.LocalApplication" Hosted="true" Singleton="false" Extension="false">
+        <ClassType ID="Postgres.Application" Comment="Application comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.LocalApplication" Hosted="true" Singleton="false" Extension="false">
           <Property ID="Info" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
         <ClassType ID="Postgres.dataBase" Comment="database comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
           <Property ID="Dbname" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
           <Property ID="hostName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
+        <ClassType ID="Postgres.dataBase.Table" Comment="table comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="Dbname" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="TableName" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
       </ClassTypes>
-	  <RelationshipTypes>
-        <RelationshipType ID="ApplHostsApplicationComponent" Base="System!System.Hosting" Accessibility="Public">
-          <Source ID="Application" Type="Postgres.Application"/>
-          <Target ID="ApplicationComponent" Type="Postgres.dataBase"/>
+      <RelationshipTypes>
+        <RelationshipType ID="ApplHostsApplicationComponent" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="Postgres.Application" />
+          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="Postgres.dataBase" />
+        </RelationshipType>
+        <RelationshipType ID="DataBaseHostsTable" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+          <Source ID="Database" MinCardinality="0" MaxCardinality="2147483647" Type="Postgres.dataBase" />
+          <Target ID="Table" MinCardinality="0" MaxCardinality="2147483647" Type="Postgres.dataBase.Table" />
         </RelationshipType>
       </RelationshipTypes>
     </EntityTypes>
   </TypeDefinitions>
   <Monitoring>
     <Discoveries>
-      <Discovery ID="PostgreSQLMP.ComputerDiscovery" Comment="ComputerDiscovery comment" Enabled="true" Target="Windows!Microsoft.Windows.Computer" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+      <Discovery ID="PostgreSQLMP.ComputerDiscovery" Enabled="true" Target="Windows!Microsoft.Windows.Computer" ConfirmDelivery="false" Remotable="true" Priority="Normal">
         <Category>Discovery</Category>
         <DiscoveryTypes>
-          <!-- <DiscoveryClass TypeID="Postgres.TargetComputer" /> -->
-		  <DiscoveryClass TypeID="Postgres.Application" />
+          <DiscoveryClass TypeID="Postgres.Application" />
         </DiscoveryTypes>
         <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.DiscoveryProvider">
-          <IntervalSeconds>360</IntervalSeconds>
+          <IntervalSeconds>14400</IntervalSeconds>
           <SyncTime />
           <ScriptName>PostgresComputerDiscovery.vbs</ScriptName>
           <Arguments>$MPElement$ $Target/Id$ $Target/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Arguments>
@@ -135,7 +142,7 @@
           <DiscoveryClass TypeID="Postgres.dataBase" />
         </DiscoveryTypes>
         <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.DiscoveryProvider">
-          <IntervalSeconds>300</IntervalSeconds>
+          <IntervalSeconds>14400</IntervalSeconds>
           <SyncTime />
           <ScriptName>PostgresdbDiscovery.vbs</ScriptName>
           <Arguments>$MPElement$ $Target/Id$ $Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Arguments>
@@ -155,32 +162,87 @@
 			On Error Resume Next
 			
 			
-				Dim conn
-				Set conn= CreateObject("ADODB.Connection")
-				conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
-				Dim version
+			Dim conn
+			Set conn= CreateObject("ADODB.Connection")
+			conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
+			Dim version
 
-				Dim rs
-				Set rs = CreateObject("ADODB.recordset")
-				'---&gt;db version
-				rs.Open "SELECT pg_database.datname as " &amp; Chr(34) &amp; " Database"&amp;Chr(34)&amp;" FROM pg_database", conn
+			Dim rs
+			Set rs = CreateObject("ADODB.recordset")
+			'---&gt;db version
+			rs.Open "SELECT pg_database.datname as " &amp; Chr(34) &amp; " Database"&amp;Chr(34)&amp;" FROM pg_database", conn
 				 
-				do until rs.EOF
-				  version = rs.Fields(0).value
-				  Dim oInstance
-				  Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='Postgres.dataBase']$")
-				  Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
-				  Call oInstance.AddProperty("$MPElement[Name='Postgres.dataBase']/Dbname$", version) 
-				  Call oInstance.AddProperty("$MPElement[Name='Postgres.dataBase']/hostName$", sComputerName) 
-				  Call oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", version) 
-				  Call oDiscoveryData.AddInstance(oInstance)
-				  rs.MoveNext
-				loop
-				rs.close
+			do until rs.EOF
+			  version = rs.Fields(0).value
+			  Dim oInstance
+			  Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='Postgres.dataBase']$")
+			  Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
+			  Call oInstance.AddProperty("$MPElement[Name='Postgres.dataBase']/Dbname$", version) 
+			  Call oInstance.AddProperty("$MPElement[Name='Postgres.dataBase']/hostName$", sComputerName) 
+			  Call oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", version) 
+			  Call oDiscoveryData.AddInstance(oInstance)
+			  rs.MoveNext
+			loop
+			rs.close
 				
+			conn.Close
+			Call oAPI.Return(oDiscoveryData)
+			</ScriptBody>
+          <TimeoutSeconds>300</TimeoutSeconds>
+        </DataSource>
+      </Discovery>
+      <Discovery ID="PostgreSQLMP.TablesDiscovery" Enabled="true" Target="Postgres.dataBase" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="Postgres.dataBase.Table" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.DiscoveryProvider">
+          <IntervalSeconds>144000</IntervalSeconds>
+          <SyncTime />
+          <ScriptName>PostgresdbDiscovery.vbs</ScriptName>
+          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ $Target/Property[Type="Postgres.dataBase"]/Dbname$</Arguments>
+          <ScriptBody>
+			Option Explicit
+			
+			Dim SourceId, ManagedEntityId, sComputerName, DbName
+			SourceId = WScript.Arguments(0) 
+			ManagedEntityId = WScript.Arguments(1)
+			sComputerName = WScript.Arguments(2)
+			DbName = WScript.Arguments(3)
+			
+			Dim oAPI
+			Set oAPI = CreateObject("MOM.ScriptAPI")
+			Dim oDiscoveryData
+			Set oDiscoveryData = oAPI.CreateDiscoveryData(0, SourceId, ManagedEntityId)
+		  
+			On Error Resume Next
+			
+			
+			Dim conn
+			Set conn= CreateObject("ADODB.Connection")
+			conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;Database="&amp;DbName
+			Dim version
+
+			Dim rs
+			Set rs = CreateObject("ADODB.recordset")
+			'---&gt;db version
+			rs.Open "SELECT table_name,Current_Database() FROM information_schema.tables Where table_schema='public'", conn
+				 
+			do until rs.EOF
+			  version = rs.Fields(0).value
+			  Dim oInstance
+			  Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='Postgres.dataBase.Table']$")
+			  Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
+			  Call oInstance.AddProperty("$MPElement[Name='Postgres.dataBase']/Dbname$", DbName) 
+			  Call oInstance.AddProperty("$MPElement[Name='Postgres.dataBase.Table']/Dbname$", DbName) 
+			  Call oInstance.AddProperty("$MPElement[Name='Postgres.dataBase.Table']/TableName$", version) 
+			  Call oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", version) 
+			  Call oDiscoveryData.AddInstance(oInstance)
+			  rs.MoveNext
+			loop
+			rs.close
 				
-		
-				conn.Close
+			conn.Close
 			Call oAPI.Return(oDiscoveryData)
 			</ScriptBody>
           <TimeoutSeconds>300</TimeoutSeconds>
@@ -188,33 +250,68 @@
       </Discovery>
     </Discoveries>
     <Monitors>
-      <UnitMonitor ID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9" Accessibility="Public" Enabled="true" Target="Postgres.dataBase" ParentMonitorID="SystemHealth!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.TwoStateMonitorType" ConfirmDelivery="false">
+      <UnitMonitor ID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9" Accessibility="Public" Enabled="false" Target="Postgres.dataBase" ParentMonitorID="SystemHealth!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.TwoStateMonitorType" ConfirmDelivery="false">
         <Category>Custom</Category>
+        <AlertSettings AlertMessage="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9_AlertMessageResourceID">
+          <AlertOnState>Error</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Error</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Data/Context/Property[@Name='Percent']$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='State']$</AlertParameter2>
+          </AlertParameters>
+        </AlertSettings>
         <OperationalStates>
-          <OperationalState ID="UIGeneratedOpStateIdf68384b05cad46a495310e6efc3b3894" MonitorTypeStateID="Error" HealthState="Warning" />
           <OperationalState ID="UIGeneratedOpStateId4fc4d86847bf49889af030e77d1ac122" MonitorTypeStateID="Success" HealthState="Success" />
+          <OperationalState ID="UIGeneratedOpStateIdf68384b05cad46a495310e6efc3b3894" MonitorTypeStateID="Error" HealthState="Error" />
         </OperationalStates>
         <Configuration>
-          <IntervalSeconds>60</IntervalSeconds>
+          <IntervalSeconds>120</IntervalSeconds>
           <SyncTime />
           <ScriptName>dbScriptTest.vbs</ScriptName>
-          <Arguments />
-          <ScriptBody>' Enter a script that outputs a property bag
-' Example VBScript:
-'
+          <Arguments>$Target/Property[Type="Postgres.dataBase"]/Dbname$</Arguments>
+          <ScriptBody>Option Explicit
+On Error Resume Next
+
+Dim dbName
+dbName = WScript.Arguments(0)
+
+Dim conn
+Set conn= CreateObject("ADODB.Connection")
+conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
+
+Dim rs
+Set rs = CreateObject("ADODB.recordset")
+
+rs.Open "SELECT COUNT(datid) AS current, (SELECT setting AS mc FROM pg_settings WHERE name = 'max_connections') AS mc,	d.datname FROM pg_database d LEFT JOIN pg_stat_activity s ON (s.datid = d.oid) Where d.datname = '"&amp; dbName &amp;"' GROUP BY 2,3	ORDER BY current DESC", conn
+				 
+Dim currentC, maxC, percent
+
+
+do until rs.EOF
+	currentC= rs.Fields(0).value
+	maxC= rs.Fields(1).value
+	percent = FormatNumber(100*CDbl(currentC) / CDbl(maxC),0)
+	rs.MoveNext
+loop
+
+rs.close
+conn.Close
+
 Dim oAPI, oBag
 Set oAPI = CreateObject("MOM.ScriptAPI")
 Set oBag = oAPI.CreatePropertyBag()
 Call oBag.AddValue("State","OK")
-Call oAPI.Return(oBag)
-                            </ScriptBody>
+Call oBag.AddValue("Percent", percent )
+Call oAPI.Return(oBag)</ScriptBody>
           <TimeoutSeconds>60</TimeoutSeconds>
           <ErrorExpression>
             <SimpleExpression>
               <ValueExpression>
                 <XPathQuery Type="String">Property[@Name='State']</XPathQuery>
               </ValueExpression>
-              <Operator>NotEqual</Operator>
+              <Operator>Equal</Operator>
               <ValueExpression>
                 <Value Type="String">OK</Value>
               </ValueExpression>
@@ -225,9 +322,331 @@ Call oAPI.Return(oBag)
               <ValueExpression>
                 <XPathQuery Type="String">Property[@Name='State']</XPathQuery>
               </ValueExpression>
-              <Operator>Equal</Operator>
+              <Operator>NotEqual</Operator>
               <ValueExpression>
                 <Value Type="String">OK</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </SuccessExpression>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="UIGeneratedMonitord4c882a63b76447380736b6e1a2c9c6e" Accessibility="Public" Enabled="true" Target="Postgres.dataBase" ParentMonitorID="SystemHealth!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.ThreeStateMonitorType" ConfirmDelivery="false">
+        <Category>Custom</Category>
+        <AlertSettings AlertMessage="UIGeneratedMonitord4c882a63b76447380736b6e1a2c9c6e_AlertMessageResourceID">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Data/Context/Property[@Name='Message']$</AlertParameter1>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="UIGeneratedOpStateId95c1b402dd034f81a92b97953df47def" MonitorTypeStateID="Success" HealthState="Success" />
+          <OperationalState ID="UIGeneratedOpStateId4b3cbd780c314262aa7bd5a171c28d94" MonitorTypeStateID="Warning" HealthState="Warning" />
+          <OperationalState ID="UIGeneratedOpStateIdd4e29bb5e3c342ab86fb52ca9bb6f9a8" MonitorTypeStateID="Error" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime />
+          <ScriptName>PtransactionsPercent.vbs</ScriptName>
+          <Arguments>$Target/Property[Type="Postgres.dataBase"]/Dbname$</Arguments>
+          <ScriptBody>Dim dbName
+dbName = WScript.Arguments(0)
+
+Dim conn
+Set conn= CreateObject("ADODB.Connection")
+conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
+
+Dim rs
+Set rs = CreateObject("ADODB.recordset")
+
+rs.Open "SELECT round(100.*sd.xact_commit/(sd.xact_commit+sd.xact_rollback), 0) AS commitratio, d.datname AS db, u.usename FROM pg_stat_database sd JOIN pg_database d ON (d.oid=sd.datid) JOIN pg_user u ON (u.usesysid=d.datdba) WHERE sd.xact_commit+sd.xact_rollback&lt;&gt;0 AND d.datname = '"&amp; dbName &amp;"'", conn
+				 
+Dim value, message
+
+do until rs.EOF
+	value= rs.Fields(0).value
+	rs.MoveNext
+loop
+
+rs.close
+conn.Close
+
+Dim key
+If CInt(value)&lt;75	Then
+	key="c"
+End If
+If CInt(value)&gt;=75 and CInt(value)&lt;=90 Then
+	key="w"
+End If
+If CInt(value)&gt;90	Then
+	key="h"
+End If
+
+Dim oAPI, oBag
+Set oAPI = CreateObject("MOM.ScriptAPI")
+Set oBag = oAPI.CreatePropertyBag()
+Call oBag.AddValue( "Value", key )
+Call oBag.AddValue( "Message", value )
+Call oAPI.Return(oBag)
+                            </ScriptBody>
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <ErrorExpression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Property[@Name='Value']</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="String">c</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </ErrorExpression>
+          <WarningExpression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Property[@Name='Value']</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="String">w</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </WarningExpression>
+          <SuccessExpression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Property[@Name='Value']</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="String">h</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </SuccessExpression>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="UIGeneratedMonitorabffe8785f5d41d09aab0cd094e1c907" Accessibility="Public" Enabled="true" Target="Postgres.Application" ParentMonitorID="SystemHealth!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.TwoStateMonitorType" ConfirmDelivery="false">
+        <Category>Custom</Category>
+        <AlertSettings AlertMessage="UIGeneratedMonitorabffe8785f5d41d09aab0cd094e1c907_AlertMessageResourceID">
+          <AlertOnState>Error</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Error</AlertSeverity>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="UIGeneratedOpStateId8ee2f5725ffe4316b46b6c5591fdd4f4" MonitorTypeStateID="Success" HealthState="Success" />
+          <OperationalState ID="UIGeneratedOpStateId566ac2350eb6422ab1f32ebbd2e8f3fb" MonitorTypeStateID="Error" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>120</IntervalSeconds>
+          <SyncTime />
+          <ScriptName>AutovacuumConfig.vbs</ScriptName>
+          <Arguments />
+          <ScriptBody>Dim conn
+Set conn= CreateObject("ADODB.Connection")
+conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
+
+Dim rs
+Set rs = CreateObject("ADODB.recordset")
+
+rs.Open "SELECT setting From pg_settings WHere name='autovacuum'", conn
+				 
+Dim value
+value = rs.Fields(0).value
+rs.close
+conn.Close
+
+Dim oAPI, oBag
+Set oAPI = CreateObject("MOM.ScriptAPI")
+Set oBag = oAPI.CreatePropertyBag()
+Call oBag.AddValue("Value",value)
+Call oAPI.Return(oBag)
+                            </ScriptBody>
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <ErrorExpression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Property[@Name='Value']</XPathQuery>
+              </ValueExpression>
+              <Operator>NotEqual</Operator>
+              <ValueExpression>
+                <Value Type="String">on</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </ErrorExpression>
+          <SuccessExpression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Property[@Name='Value']</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="String">on</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </SuccessExpression>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="UIGeneratedMonitor9101dcb3b8514c76ae6f375884edcd91" Accessibility="Public" Enabled="true" Target="Postgres.dataBase" ParentMonitorID="SystemHealth!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.ThreeStateMonitorType" ConfirmDelivery="false">
+        <Category>Custom</Category>
+        <AlertSettings AlertMessage="UIGeneratedMonitor9101dcb3b8514c76ae6f375884edcd91_AlertMessageResourceID">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Error</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Property[Type="Postgres.dataBase"]/Dbname$</AlertParameter1>
+            <AlertParameter2>$Target/Property[Type="Postgres.dataBase"]/hostName$</AlertParameter2>
+            <AlertParameter3>$Data/Context/Property[@Name='Message']$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="UIGeneratedOpStateId1d3d38278d0048e58d92946032a4d86d" MonitorTypeStateID="Success" HealthState="Success" />
+          <OperationalState ID="UIGeneratedOpStateId8a78a5d8444a461cbf5c9a5ada42ef0f" MonitorTypeStateID="Warning" HealthState="Warning" />
+          <OperationalState ID="UIGeneratedOpStateId695a433cd83446d9aace7d252c8ffb28" MonitorTypeStateID="Error" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime />
+          <ScriptName>cachehit.vbs</ScriptName>
+          <Arguments>$Target/Property[Type="Postgres.dataBase"]/Dbname$</Arguments>
+          <ScriptBody>Dim dbName
+dbName = WScript.Arguments(0)
+
+Dim conn
+Set conn= CreateObject("ADODB.Connection")
+conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
+
+Dim rs
+Set rs = CreateObject("ADODB.recordset")
+
+rs.Open "SELECT round(100.*sd.blks_hit/(sd.blks_read+sd.blks_hit), 2) AS dhitratio,  d.datname,  u.usename FROM pg_stat_database sd JOIN pg_database d ON (d.oid=sd.datid) JOIN pg_user u ON (u.usesysid=d.datdba) WHERE sd.blks_read+sd.blks_hit&lt;&gt;0 AND d.datname = '"&amp;dbName&amp;"'", conn
+				 
+Dim value
+ value = rs.Fields(0).value
+rs.close
+conn.Close
+
+value = CInt(Value)
+Dim key
+If value&lt;30 then
+	key="c"
+End If
+If value&gt;=30 and value&lt;=70 then
+	key="w"
+End If
+If value&gt;70 then
+	key="h"
+End If
+
+Dim oAPI, oBag
+Set oAPI = CreateObject("MOM.ScriptAPI")
+Set oBag = oAPI.CreatePropertyBag()
+Call oBag.AddValue("Value", key )
+Call oBag.AddValue("Message", value )
+Call oAPI.Return(oBag)
+                            </ScriptBody>
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <ErrorExpression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Property[@Name='Value']</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="String">c</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </ErrorExpression>
+          <WarningExpression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Property[@Name='Value']</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="String">w</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </WarningExpression>
+          <SuccessExpression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Property[@Name='Value']</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="String">h</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </SuccessExpression>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="UIGeneratedMonitorb9e7d1402e0d484e87ed2d55c74509bd" Accessibility="Public" Enabled="true" Target="Postgres.dataBase.Table" ParentMonitorID="SystemHealth!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.TwoStateMonitorType" ConfirmDelivery="false">
+        <Category>Custom</Category>
+        <OperationalStates>
+          <OperationalState ID="UIGeneratedOpStateId5fd30d383cda4411bc246079ee3de226" MonitorTypeStateID="Success" HealthState="Success" />
+          <OperationalState ID="UIGeneratedOpStateId9ba75359a41940089a81d4ceffc961ed" MonitorTypeStateID="Error" HealthState="Warning" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>1800</IntervalSeconds>
+          <SyncTime />
+          <ScriptName>TableIndexHit.vbs</ScriptName>
+          <Arguments>$Target/Property[Type="Postgres.dataBase.Table"]/Dbname$ $Target/Property[Type="Postgres.dataBase.Table"]/TableName$</Arguments>
+          <ScriptBody>Dim dbName,tableName
+dbName = WScript.Arguments(0)
+tableName = WScript.Arguments(1)
+
+Dim conn
+Set conn= CreateObject("ADODB.Connection")
+conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;Database="&amp;dbName
+
+Dim rs
+Set rs = CreateObject("ADODB.recordset")
+
+rs.Open "SELECT CASE WHEN idx_scan = 0 THEN 100 ELSE seq_scan::float4 / idx_scan * 100 END AS ratio, relname, seq_scan, idx_scan FROM pg_stat_user_tables WHERE relname='"&amp;tableName&amp;"' ", conn
+				 
+Dim value
+value = rs.Fields(0).value
+rs.close
+conn.Close
+
+value = CInt(Value)
+Dim key
+If value&lt;30 then
+	key="w"
+Else
+	key="h"
+End If
+
+Dim oAPI, oBag
+Set oAPI = CreateObject("MOM.ScriptAPI")
+Set oBag = oAPI.CreatePropertyBag()
+Call oBag.AddValue("Value", key )
+Call oBag.AddValue("Message", value )
+Call oAPI.Return(oBag)</ScriptBody>
+          <TimeoutSeconds>60</TimeoutSeconds>
+          <ErrorExpression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Property[@Name='Value']</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="String">w</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </ErrorExpression>
+          <SuccessExpression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="String">Property[@Name='Value']</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="String">h</Value>
               </ValueExpression>
             </SimpleExpression>
           </SuccessExpression>
@@ -342,111 +761,6 @@ Call oAPI.Return(oBag)
         </Presentation>
         <Target />
       </View>
-      <View ID="View_dc2c773d3468454f98df15b2911d701e" Accessibility="Public" Enabled="true" Target="Postgres.TargetComputer" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
-        <Category>Operations</Category>
-        <Criteria>
-          <InMaintenanceMode>false</InMaintenanceMode>
-        </Criteria>
-        <Presentation>
-          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
-            <Name>State</Name>
-            <Id>Postgres.TargetComputer-*-4e13091d-2212-3431-d51c-c44fa8928838-*-Health</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>In Maintenance Mode</Name>
-            <Id>InMaintenanceMode</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Name</Name>
-            <Id>Name</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Path</Name>
-            <Id>Path</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Display Name</Name>
-            <Id>System.Entity/DisplayName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Principal Name</Name>
-            <Id>Microsoft.Windows.Computer/PrincipalName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>DNS Name</Name>
-            <Id>Microsoft.Windows.Computer/DNSName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="7" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>NetBIOS Computer Name</Name>
-            <Id>Microsoft.Windows.Computer/NetbiosComputerName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="8" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>NetBIOS Domain Name</Name>
-            <Id>Microsoft.Windows.Computer/NetbiosDomainName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="9" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>IP Address</Name>
-            <Id>Microsoft.Windows.Computer/IPAddress</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="10" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Network Name</Name>
-            <Id>Microsoft.Windows.Computer/NetworkName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="11" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Active Directory SID</Name>
-            <Id>Microsoft.Windows.Computer/ActiveDirectoryObjectSid</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="12" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="false" Visible="false" SortOrder="Ascending">
-            <Name>Virtual Machine</Name>
-            <Id>Microsoft.Windows.Computer/IsVirtualMachine</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="13" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>DNS Domain Name</Name>
-            <Id>Microsoft.Windows.Computer/DomainDnsName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="14" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Organizational Unit</Name>
-            <Id>Microsoft.Windows.Computer/OrganizationalUnit</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="15" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>DNS Forest Name</Name>
-            <Id>Microsoft.Windows.Computer/ForestDnsName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="16" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Active Directory Site</Name>
-            <Id>Microsoft.Windows.Computer/ActiveDirectorySite</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="17" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Logical Processors</Name>
-            <Id>Microsoft.Windows.Computer/LogicalProcessors</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="18" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Physical Processors</Name>
-            <Id>Microsoft.Windows.Computer/PhysicalProcessors</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="19" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Host Server Name</Name>
-            <Id>Microsoft.Windows.Computer/HostServerName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="20" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Virtual Machine Name</Name>
-            <Id>Microsoft.Windows.Computer/VirtualMachineName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="21" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Offset In Minutes From Greenwich Time</Name>
-            <Id>Microsoft.Windows.Computer/OffsetInMinuteFromGreenwichTime</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="22" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="false" Visible="false" SortOrder="Ascending">
-            <Name>Last Inventory Date</Name>
-            <Id>Microsoft.Windows.Computer/LastInventoryDate</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="23" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Version</Name>
-            <Id>Postgres.TargetComputer/Version</Id>
-          </ColumnInfo>
-        </Presentation>
-        <Target />
-      </View>
       <View ID="View_d0f8602482e547cfaeffcdabecb8244e" Accessibility="Public" Enabled="true" Target="Postgres.dataBase" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria>
@@ -457,7 +771,7 @@ Call oAPI.Return(oBag)
             <Name>State</Name>
             <Id>Postgres.dataBase-*-acc2faa9-eb6c-4b8d-5038-4d5e843b3f5a-*-Health</Id>
           </ColumnInfo>
-          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
             <Name>In Maintenance Mode</Name>
             <Id>InMaintenanceMode</Id>
           </ColumnInfo>
@@ -545,9 +859,83 @@ Call oAPI.Return(oBag)
             <Name>Last Inventory Date</Name>
             <Id>Microsoft.Windows.Computer/LastInventoryDate</Id>
           </ColumnInfo>
-          <ColumnInfo Index="23" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+          <ColumnInfo Index="23" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
             <Name>Dbname</Name>
             <Id>Postgres.dataBase/Dbname</Id>
+          </ColumnInfo>
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_7316caac01d94258853709ec43381cd2" Accessibility="Public" Enabled="true" Target="Postgres.Application" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <InMaintenanceMode>false</InMaintenanceMode>
+        </Criteria>
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>State</Name>
+            <Id>Postgres.Application-*-bfded8f9-49bb-b448-9516-f7c659097443-*-Health</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>System.Entity/DisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Info</Name>
+            <Id>Postgres.Application/Info</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Postgres dataBase</Name>
+            <Id>Postgres.dataBase</Id>
+          </ColumnInfo>
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_7c4202f6b4154825b6050f9574edbd7c" Accessibility="Public" Enabled="true" Target="Postgres.dataBase.Table" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <InMaintenanceMode>false</InMaintenanceMode>
+        </Criteria>
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>State</Name>
+            <Id>Postgres.dataBase.Table-*-d66af399-08ef-6ea3-1a5f-b23ac8c9f0c9-*-Health</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>In Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>System.Entity/DisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Dbname</Name>
+            <Id>Postgres.dataBase.Table/Dbname</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>TableName</Name>
+            <Id>Postgres.dataBase.Table/TableName</Id>
           </ColumnInfo>
         </Presentation>
         <Target />
@@ -557,9 +945,16 @@ Call oAPI.Return(oBag)
       <Folder ID="Folder_44dcd909385f4e21add332977bb8fc57" Accessibility="Public" ParentFolder="SC!Microsoft.SystemCenter.Monitoring.ViewFolder.Root" />
     </Folders>
     <FolderItems>
-      <FolderItem ElementID="View_dc2c773d3468454f98df15b2911d701e" ID="i170ca6dfc15d44f5a2d4ff92b943c90a" Folder="Folder_44dcd909385f4e21add332977bb8fc57" />
       <FolderItem ElementID="View_d0f8602482e547cfaeffcdabecb8244e" ID="i33130bfcafbd4e9086bc33eae7c11fe1" Folder="Folder_44dcd909385f4e21add332977bb8fc57" />
+      <FolderItem ElementID="View_7316caac01d94258853709ec43381cd2" ID="ia87d7e1bf2a844058693a68a1f4dd673" Folder="Folder_44dcd909385f4e21add332977bb8fc57" />
+      <FolderItem ElementID="View_7c4202f6b4154825b6050f9574edbd7c" ID="ie7b6bc976d104e3cbab52cdab94367d3" Folder="Folder_44dcd909385f4e21add332977bb8fc57" />
     </FolderItems>
+    <StringResources>
+      <StringResource ID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9_AlertMessageResourceID" />
+      <StringResource ID="UIGeneratedMonitord4c882a63b76447380736b6e1a2c9c6e_AlertMessageResourceID" />
+      <StringResource ID="UIGeneratedMonitorabffe8785f5d41d09aab0cd094e1c907_AlertMessageResourceID" />
+      <StringResource ID="UIGeneratedMonitor9101dcb3b8514c76ae6f375884edcd91_AlertMessageResourceID" />
+    </StringResources>
   </Presentation>
   <LanguagePacks>
     <LanguagePack ID="RUS" IsDefault="true">
@@ -603,20 +998,87 @@ Call oAPI.Return(oBag)
         <DisplayString ElementID="Folder_44dcd909385f4e21add332977bb8fc57">
           <Name>Postgres</Name>
         </DisplayString>
-        <DisplayString ElementID="View_dc2c773d3468454f98df15b2911d701e">
-          <Name>computers</Name>
-        </DisplayString>
         <DisplayString ElementID="View_d0f8602482e547cfaeffcdabecb8244e">
           <Name>db</Name>
         </DisplayString>
         <DisplayString ElementID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9">
           <Name>testdb</Name>
-          <Description />
         </DisplayString>
         <DisplayString ElementID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9" SubElementID="UIGeneratedOpStateIdf68384b05cad46a495310e6efc3b3894">
           <Name>Unhealthy</Name>
         </DisplayString>
         <DisplayString ElementID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9" SubElementID="UIGeneratedOpStateId4fc4d86847bf49889af030e77d1ac122">
+          <Name>Healthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_7316caac01d94258853709ec43381cd2">
+          <Name>app</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9_AlertMessageResourceID">
+          <Name>testdb</Name>
+          <Description>Percent:{0}
+State:{1}</Description>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitord4c882a63b76447380736b6e1a2c9c6e">
+          <Name>TransactionsPercent</Name>
+          <Description>Percent of transactions that are success</Description>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitord4c882a63b76447380736b6e1a2c9c6e" SubElementID="UIGeneratedOpStateId4b3cbd780c314262aa7bd5a171c28d94">
+          <Name>Degraded</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitord4c882a63b76447380736b6e1a2c9c6e" SubElementID="UIGeneratedOpStateIdd4e29bb5e3c342ab86fb52ca9bb6f9a8">
+          <Name>Unhealthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitord4c882a63b76447380736b6e1a2c9c6e" SubElementID="UIGeneratedOpStateId95c1b402dd034f81a92b97953df47def">
+          <Name>Healthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitord4c882a63b76447380736b6e1a2c9c6e_AlertMessageResourceID">
+          <Name>TransactionsPercent</Name>
+          <Description>{0}</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgreSQLMP.ComputerDiscovery">
+          <Name>PostgreSQLMP.ComputerDiscovery</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitorabffe8785f5d41d09aab0cd094e1c907">
+          <Name>AutovacuumConfig</Name>
+          <Description>Autovacuum enabled?</Description>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitorabffe8785f5d41d09aab0cd094e1c907" SubElementID="UIGeneratedOpStateId8ee2f5725ffe4316b46b6c5591fdd4f4">
+          <Name>Healthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitorabffe8785f5d41d09aab0cd094e1c907" SubElementID="UIGeneratedOpStateId566ac2350eb6422ab1f32ebbd2e8f3fb">
+          <Name>Unhealthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitorabffe8785f5d41d09aab0cd094e1c907_AlertMessageResourceID">
+          <Name>AutovacuumConfig</Name>
+          <Description>AUTOVACUUM IS OFF!!!!!!</Description>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitor9101dcb3b8514c76ae6f375884edcd91">
+          <Name>CacheHit</Name>
+          <Description>cache rit monitoring</Description>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitor9101dcb3b8514c76ae6f375884edcd91" SubElementID="UIGeneratedOpStateId8a78a5d8444a461cbf5c9a5ada42ef0f">
+          <Name>Degraded</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitor9101dcb3b8514c76ae6f375884edcd91" SubElementID="UIGeneratedOpStateId695a433cd83446d9aace7d252c8ffb28">
+          <Name>Unhealthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitor9101dcb3b8514c76ae6f375884edcd91" SubElementID="UIGeneratedOpStateId1d3d38278d0048e58d92946032a4d86d">
+          <Name>Healthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitor9101dcb3b8514c76ae6f375884edcd91_AlertMessageResourceID">
+          <Name>CacheHit</Name>
+          <Description>Cache hit of data base {0} on machine {1} is bad: Value = {2}</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_7c4202f6b4154825b6050f9574edbd7c">
+          <Name>ta</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitorb9e7d1402e0d484e87ed2d55c74509bd">
+          <Name>IndexHit</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitorb9e7d1402e0d484e87ed2d55c74509bd" SubElementID="UIGeneratedOpStateId9ba75359a41940089a81d4ceffc961ed">
+          <Name>Unhealthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="UIGeneratedMonitorb9e7d1402e0d484e87ed2d55c74509bd" SubElementID="UIGeneratedOpStateId5fd30d383cda4411bc246079ee3de226">
           <Name>Healthy</Name>
         </DisplayString>
       </DisplayStrings>
