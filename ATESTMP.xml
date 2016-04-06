@@ -1,0 +1,345 @@
+﻿<?xml version="1.0" encoding="utf-8"?><ManagementPack ContentReadable="true" SchemaVersion="2.0" OriginalSchemaVersion="1.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <Manifest>
+    <Identity>
+      <ID>ATESTMP</ID>
+      <Version>1.0.0.2</Version>
+    </Identity>
+    <Name>ATESTMP</Name>
+    <References>
+      <Reference Alias="SCInternal">
+        <ID>Microsoft.SystemCenter.Internal</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SCDW">
+        <ID>Microsoft.SystemCenter.DataWarehouse.Library</ID>
+        <Version>7.1.10226.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="UnixAuth">
+        <ID>Unix.Authoring.Library</ID>
+        <Version>7.3.1.2</Version>
+        <PublicKeyToken>a0ae1bc76c673799</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Windows">
+        <ID>Microsoft.Windows.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SystemPerf">
+        <ID>System.Performance.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SystemCenter">
+        <ID>Microsoft.SystemCenter.Visualization.Library</ID>
+        <Version>7.1.10226.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="MicrosoftSystemCenterInstanceGroupLibrary7585010">
+        <ID>Microsoft.SystemCenter.InstanceGroup.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="System">
+        <ID>System.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="ComponentRequiredReference1">
+        <ID>Microsoft.SystemCenter.Image.Library</ID>
+        <Version>7.1.10226.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SC">
+        <ID>Microsoft.SystemCenter.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Unix">
+        <ID>Microsoft.Unix.Library</ID>
+        <Version>7.5.1050.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SystemHealth">
+        <ID>System.Health.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+    </References>
+  </Manifest>
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+        <ClassType ID="TESTCLASSATEST" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.LocalApplication" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="info" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+		  <Property ID="psqlPath" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+		<ClassType ID="Postgres.Unix.DataBase" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="Dbname" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="hostName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+		<ClassType ID="Postgres.Unix.Table" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="TableName" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="DBName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+      </ClassTypes>
+	  <RelationshipTypes>
+		<RelationshipType ID="UnChostsDB" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="TESTCLASSATEST" />
+          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="Postgres.Unix.DataBase" />
+        </RelationshipType>
+		<RelationshipType ID="DBhasTable" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="Postgres.Unix.DataBase" />
+          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="Postgres.Unix.Table" />
+        </RelationshipType>
+	  </RelationshipTypes>
+    </EntityTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Discoveries>
+      <Discovery ID="ATESTMP.Discovery" Enabled="true" Target="Unix!Microsoft.Unix.Computer" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="TESTCLASSATEST" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
+          <Interval>180</Interval>
+          <TargetSystem>$Target/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</TargetSystem>
+          <ShellScript>
+				#!/bin/sh				
+				if pgrep postgres > /dev/null
+				then
+					DATABASE=postgres
+					USERNAME=postgres
+					echo "$1;""$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -c "select version()")"
+				else
+					exit 1
+				fi
+		  </ShellScript>
+          <ScriptArguments>/opt/PostgreSQL/9.1/bin</ScriptArguments>
+          <Timeout>30</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <PSScriptName>ATEST.ps1</PSScriptName>
+          <PSScriptBody>
+				param([string]$StdOut,[string]$StdErr,[string]$ReturnCode)
+				if ($ReturnCode -eq "0"){
+					$splited = $StdOut.Replace(" ","_").Split(";")
+					$version = $splited[1]
+					$path = $splited[0]
+					$api = New-Object -comObject 'MOM.ScriptAPI'
+					$bag = $api.CreatePropertyBag()
+					$bag.AddValue("info","$version")
+					$bag.AddValue("psqlPath","$path")
+					$bag
+				}
+		  </PSScriptBody>
+          <FilterExpression>
+          </FilterExpression>
+          <ClassId>$MPElement[Name="TESTCLASSATEST"]$</ClassId>
+          <InstanceSettings>
+            <Settings>
+              <Setting>
+                <Name>$MPElement[Name='Unix!Microsoft.Unix.Computer']/PrincipalName$</Name>
+                <Value>$Target/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='TESTCLASSATEST']/info$</Name>
+                <Value>$Data/Property[@Name='info']$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='TESTCLASSATEST']/psqlPath$</Name>
+                <Value>$Data/Property[@Name='psqlPath']$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='System!System.Entity']/DisplayName$</Name>
+                <Value>PostgreSQL</Value>
+              </Setting>
+            </Settings>
+          </InstanceSettings>
+        </DataSource>
+      </Discovery>
+	  <Discovery ID="ATESTMP.DiscoveryDB" Enabled="true" Target="TESTCLASSATEST" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="Postgres.Unix.DataBase" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
+          <Interval>180</Interval>
+          <TargetSystem>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</TargetSystem>
+          <ShellScript>
+				#!/bin/sh	
+				DATABASE=postgres
+				USERNAME=postgres
+				$1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A --record-separator=";" -c "SELECT pg_database.datname from pg_database where datistemplate='f'"
+		  </ShellScript>
+          <ScriptArguments>$Target/Property[Type="TESTCLASSATEST"]/psqlPath$</ScriptArguments>
+          <Timeout>30</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <PSScriptName>ATEST11.ps1</PSScriptName>
+          <PSScriptBody>
+				param([string]$StdOut,[string]$StdErr,[string]$ReturnCode)
+				if ($ReturnCode -eq "0"){
+					$api = New-Object -comObject 'MOM.ScriptAPI'
+					$StdOut.Split(";") | ForEach {
+						$nospace = $_.Replace(" ","_")
+						$bag = $api.CreatePropertyBag()
+						$bag.AddValue("NoSpaseName","$nospace")
+						$bag.AddValue("Dbname","$_")
+						$bag
+					}
+				}
+		  </PSScriptBody>
+		  <FilterExpression>
+          </FilterExpression>
+		  <ClassId>$MPElement[Name="Postgres.Unix.DataBase"]$</ClassId>
+		  <InstanceSettings>
+            <Settings>
+              <Setting>
+                <Name>$MPElement[Name='Unix!Microsoft.Unix.Computer']/PrincipalName$</Name>
+                <Value>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='Postgres.Unix.DataBase']/Dbname$</Name>
+                <Value>$Data/Property[@Name='Dbname']$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='Postgres.Unix.DataBase']/hostName$</Name>
+                <Value>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='System!System.Entity']/DisplayName$</Name>
+                <Value>$Data/Property[@Name='NoSpaseName']$</Value>
+              </Setting>
+            </Settings>
+			</InstanceSettings>
+        </DataSource>
+      </Discovery>
+	  <Discovery ID="ATESTMP.DiscoveryTable" Enabled="true" Target="Postgres.Unix.DataBase" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="Postgres.Unix.Table" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
+          <Interval>180</Interval>
+          <TargetSystem>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</TargetSystem>
+          <ShellScript>
+				#!/bin/sh	
+				DATABASE=$2
+				USERNAME=postgres
+				$1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A --record-separator=";" -c "SELECT table_name FROM information_schema.tables Where table_schema='public'"
+		  </ShellScript>
+          <ScriptArguments>$Target/Host/Property[Type="TESTCLASSATEST"]/psqlPath$ "$Target/Property[Type="Postgres.Unix.DataBase"]/Dbname$"</ScriptArguments>
+          <Timeout>30</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <PSScriptName>ATESTTABLE.ps1</PSScriptName>
+          <PSScriptBody>
+				param([string]$StdOut,[string]$StdErr,[string]$ReturnCode)
+				if (($ReturnCode -eq "0") -and ($StdOut -ne "")){
+					$api = New-Object -comObject 'MOM.ScriptAPI'
+					$StdOut.Split(";") | ForEach {
+						$nospace = $_.Replace(" ","_")
+						$bag = $api.CreatePropertyBag()
+						$bag.AddValue("NoSpaseName","$nospace")
+						$bag.AddValue("TableName","$_")
+						$bag
+					}
+				} else {
+				
+				}
+		  </PSScriptBody>
+		  <FilterExpression>
+          </FilterExpression>
+		  <ClassId>$MPElement[Name="Postgres.Unix.Table"]$</ClassId>
+		  <InstanceSettings>
+            <Settings>
+              <Setting>
+                <Name>$MPElement[Name='Unix!Microsoft.Unix.Computer']/PrincipalName$</Name>
+                <Value>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='Postgres.Unix.Table']/TableName$</Name>
+                <Value>$Data/Property[@Name='TableName']$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='Postgres.Unix.Table']/DBName$</Name>
+                <Value>$Target/Property[Type="Postgres.Unix.DataBase"]/Dbname$</Value>
+              </Setting>
+			  <Setting>
+                <Name>$MPElement[Name='Postgres.Unix.DataBase']/Dbname$</Name>
+                <Value>$Target/Property[Type="Postgres.Unix.DataBase"]/Dbname$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='System!System.Entity']/DisplayName$</Name>
+                <Value>$Data/Property[@Name='NoSpaseName']$</Value>
+              </Setting>
+            </Settings>
+			</InstanceSettings>
+        </DataSource>
+      </Discovery>
+    </Discoveries>
+  </Monitoring>
+  <Presentation>
+    <Views>
+      <View ID="View_64adf0509028499a832828f6361b8a33" Accessibility="Public" Enabled="true" Target="TESTCLASSATEST" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <InMaintenanceMode>false</InMaintenanceMode>
+        </Criteria>
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>State</Name>
+            <Id>TESTCLASSATEST-*-89345541-016d-70e6-5417-c126feb42f3f-*-Health</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>System.Entity/DisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>aName</Name>
+            <Id>TESTCLASSATEST/aName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>info</Name>
+            <Id>TESTCLASSATEST/info</Id>
+          </ColumnInfo>
+        </Presentation>
+        <Target />
+      </View>
+    </Views>
+    <Folders>
+      <Folder ID="Folder_60633f2750b246e598d11d6961e7c7f4" Accessibility="Public" ParentFolder="SC!Microsoft.SystemCenter.Monitoring.ViewFolder.Root" />
+    </Folders>
+    <FolderItems>
+      <FolderItem ElementID="View_64adf0509028499a832828f6361b8a33" ID="if89969a8322549dfb5d5eaeacf70c48d" Folder="Folder_60633f2750b246e598d11d6961e7c7f4" />
+    </FolderItems>
+  </Presentation>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="false">
+      <DisplayStrings>
+        <DisplayString ElementID="Folder_60633f2750b246e598d11d6961e7c7f4">
+          <Name>atest</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_64adf0509028499a832828f6361b8a33">
+          <Name>view</Name>
+          <Description />
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPack>
