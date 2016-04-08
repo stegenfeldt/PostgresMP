@@ -71,27 +71,27 @@
   <TypeDefinitions>
     <EntityTypes>
       <ClassTypes>
-        <ClassType ID="TESTCLASSATEST" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.LocalApplication" Hosted="true" Singleton="false" Extension="false">
+        <ClassType ID="PostgresMP.Unix.Application" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.LocalApplication" Hosted="true" Singleton="false" Extension="false">
           <Property ID="info" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
 		  <Property ID="psqlPath" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
-		<ClassType ID="Postgres.Unix.DataBase" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+		<ClassType ID="PostgresMP.Unix.DataBase" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
           <Property ID="Dbname" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
           <Property ID="hostName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
-		<ClassType ID="Postgres.Unix.Table" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+		<ClassType ID="PostgresMP.Unix.Table" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
           <Property ID="TableName" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
           <Property ID="DBName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
       </ClassTypes>
 	  <RelationshipTypes>
 		<RelationshipType ID="UnChostsDB" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
-          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="TESTCLASSATEST" />
-          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="Postgres.Unix.DataBase" />
+          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Unix.Application" />
+          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Unix.DataBase" />
         </RelationshipType>
 		<RelationshipType ID="DBhasTable" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
-          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="Postgres.Unix.DataBase" />
-          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="Postgres.Unix.Table" />
+          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Unix.DataBase" />
+          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Unix.Table" />
         </RelationshipType>
 	  </RelationshipTypes>
     </EntityTypes>
@@ -101,7 +101,7 @@
       <Discovery ID="ATESTMP.Discovery" Enabled="true" Target="Unix!Microsoft.Unix.Computer" ConfirmDelivery="false" Remotable="true" Priority="Normal">
         <Category>Discovery</Category>
         <DiscoveryTypes>
-          <DiscoveryClass TypeID="TESTCLASSATEST" />
+          <DiscoveryClass TypeID="PostgresMP.Unix.Application" />
         </DiscoveryTypes>
         <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
           <Interval>180</Interval>
@@ -137,7 +137,7 @@
 		  </PSScriptBody>
           <FilterExpression>
           </FilterExpression>
-          <ClassId>$MPElement[Name="TESTCLASSATEST"]$</ClassId>
+          <ClassId>$MPElement[Name="PostgresMP.Unix.Application"]$</ClassId>
           <InstanceSettings>
             <Settings>
               <Setting>
@@ -145,11 +145,11 @@
                 <Value>$Target/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
               </Setting>
               <Setting>
-                <Name>$MPElement[Name='TESTCLASSATEST']/info$</Name>
+                <Name>$MPElement[Name='PostgresMP.Unix.Application']/info$</Name>
                 <Value>$Data/Property[@Name='info']$</Value>
               </Setting>
               <Setting>
-                <Name>$MPElement[Name='TESTCLASSATEST']/psqlPath$</Name>
+                <Name>$MPElement[Name='PostgresMP.Unix.Application']/psqlPath$</Name>
                 <Value>$Data/Property[@Name='psqlPath']$</Value>
               </Setting>
               <Setting>
@@ -160,10 +160,10 @@
           </InstanceSettings>
         </DataSource>
       </Discovery>
-	  <Discovery ID="ATESTMP.DiscoveryDB" Enabled="true" Target="TESTCLASSATEST" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+	  <Discovery ID="ATESTMP.DiscoveryDB" Enabled="true" Target="PostgresMP.Unix.Application" ConfirmDelivery="false" Remotable="true" Priority="Normal">
         <Category>Discovery</Category>
         <DiscoveryTypes>
-          <DiscoveryClass TypeID="Postgres.Unix.DataBase" />
+          <DiscoveryClass TypeID="PostgresMP.Unix.DataBase" />
         </DiscoveryTypes>
         <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
           <Interval>180</Interval>
@@ -174,7 +174,7 @@
 				USERNAME=postgres
 				$1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A --record-separator=";" -c "SELECT pg_database.datname from pg_database where datistemplate='f'"
 		  </ShellScript>
-          <ScriptArguments>$Target/Property[Type="TESTCLASSATEST"]/psqlPath$</ScriptArguments>
+          <ScriptArguments>$Target/Property[Type="PostgresMP.Unix.Application"]/psqlPath$</ScriptArguments>
           <Timeout>30</Timeout>
           <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
           <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
@@ -194,7 +194,7 @@
 		  </PSScriptBody>
 		  <FilterExpression>
           </FilterExpression>
-		  <ClassId>$MPElement[Name="Postgres.Unix.DataBase"]$</ClassId>
+		  <ClassId>$MPElement[Name="PostgresMP.Unix.DataBase"]$</ClassId>
 		  <InstanceSettings>
             <Settings>
               <Setting>
@@ -202,11 +202,11 @@
                 <Value>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
               </Setting>
               <Setting>
-                <Name>$MPElement[Name='Postgres.Unix.DataBase']/Dbname$</Name>
+                <Name>$MPElement[Name='PostgresMP.Unix.DataBase']/Dbname$</Name>
                 <Value>$Data/Property[@Name='Dbname']$</Value>
               </Setting>
               <Setting>
-                <Name>$MPElement[Name='Postgres.Unix.DataBase']/hostName$</Name>
+                <Name>$MPElement[Name='PostgresMP.Unix.DataBase']/hostName$</Name>
                 <Value>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
               </Setting>
               <Setting>
@@ -217,10 +217,10 @@
 			</InstanceSettings>
         </DataSource>
       </Discovery>
-	  <Discovery ID="ATESTMP.DiscoveryTable" Enabled="true" Target="Postgres.Unix.DataBase" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+	  <Discovery ID="ATESTMP.DiscoveryTable" Enabled="true" Target="PostgresMP.Unix.DataBase" ConfirmDelivery="false" Remotable="true" Priority="Normal">
         <Category>Discovery</Category>
         <DiscoveryTypes>
-          <DiscoveryClass TypeID="Postgres.Unix.Table" />
+          <DiscoveryClass TypeID="PostgresMP.Unix.Table" />
         </DiscoveryTypes>
         <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
           <Interval>180</Interval>
@@ -231,7 +231,7 @@
 				USERNAME=postgres
 				$1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A --record-separator=";" -c "SELECT table_name FROM information_schema.tables Where table_schema='public'"
 		  </ShellScript>
-          <ScriptArguments>$Target/Host/Property[Type="TESTCLASSATEST"]/psqlPath$ "$Target/Property[Type="Postgres.Unix.DataBase"]/Dbname$"</ScriptArguments>
+          <ScriptArguments>$Target/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$"</ScriptArguments>
           <Timeout>30</Timeout>
           <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
           <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
@@ -253,7 +253,7 @@
 		  </PSScriptBody>
 		  <FilterExpression>
           </FilterExpression>
-		  <ClassId>$MPElement[Name="Postgres.Unix.Table"]$</ClassId>
+		  <ClassId>$MPElement[Name="PostgresMP.Unix.Table"]$</ClassId>
 		  <InstanceSettings>
             <Settings>
               <Setting>
@@ -261,16 +261,16 @@
                 <Value>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
               </Setting>
               <Setting>
-                <Name>$MPElement[Name='Postgres.Unix.Table']/TableName$</Name>
+                <Name>$MPElement[Name='PostgresMP.Unix.Table']/TableName$</Name>
                 <Value>$Data/Property[@Name='TableName']$</Value>
               </Setting>
               <Setting>
-                <Name>$MPElement[Name='Postgres.Unix.Table']/DBName$</Name>
-                <Value>$Target/Property[Type="Postgres.Unix.DataBase"]/Dbname$</Value>
+                <Name>$MPElement[Name='PostgresMP.Unix.Table']/DBName$</Name>
+                <Value>$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$</Value>
               </Setting>
 			  <Setting>
-                <Name>$MPElement[Name='Postgres.Unix.DataBase']/Dbname$</Name>
-                <Value>$Target/Property[Type="Postgres.Unix.DataBase"]/Dbname$</Value>
+                <Name>$MPElement[Name='PostgresMP.Unix.DataBase']/Dbname$</Name>
+                <Value>$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$</Value>
               </Setting>
               <Setting>
                 <Name>$MPElement[Name='System!System.Entity']/DisplayName$</Name>
@@ -284,7 +284,7 @@
   </Monitoring>
   <Presentation>
     <Views>
-      <View ID="View_64adf0509028499a832828f6361b8a33" Accessibility="Public" Enabled="true" Target="TESTCLASSATEST" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+      <View ID="View_64adf0509028499a832828f6361b8a33" Accessibility="Public" Enabled="true" Target="PostgresMP.Unix.Application" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria>
           <InMaintenanceMode>false</InMaintenanceMode>
@@ -292,7 +292,7 @@
         <Presentation>
           <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
             <Name>State</Name>
-            <Id>TESTCLASSATEST-*-89345541-016d-70e6-5417-c126feb42f3f-*-Health</Id>
+            <Id>PostgresMP.Unix.Application-*-89345541-016d-70e6-5417-c126feb42f3f-*-Health</Id>
           </ColumnInfo>
           <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
             <Name>Maintenance Mode</Name>
@@ -312,11 +312,11 @@
           </ColumnInfo>
           <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
             <Name>aName</Name>
-            <Id>TESTCLASSATEST/aName</Id>
+            <Id>PostgresMP.Unix.Application/aName</Id>
           </ColumnInfo>
           <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
             <Name>info</Name>
-            <Id>TESTCLASSATEST/info</Id>
+            <Id>PostgresMP.Unix.Application/info</Id>
           </ColumnInfo>
         </Presentation>
         <Target />
