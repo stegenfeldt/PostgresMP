@@ -1,0 +1,929 @@
+﻿<?xml version="1.0" encoding="utf-8"?><ManagementPack ContentReadable="true" SchemaVersion="2.0" OriginalSchemaVersion="1.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <Manifest>
+    <Identity>
+      <ID>PostgresMPUnix</ID>
+      <Version>1.0.0.3</Version>
+    </Identity>
+    <Name>PostgresMPUnix</Name>
+    <References>
+      <Reference Alias="SCInternal">
+        <ID>Microsoft.SystemCenter.Internal</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SCDW">
+        <ID>Microsoft.SystemCenter.DataWarehouse.Library</ID>
+        <Version>7.1.10226.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="UnixAuth">
+        <ID>Unix.Authoring.Library</ID>
+        <Version>7.3.1.2</Version>
+        <PublicKeyToken>a0ae1bc76c673799</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Windows">
+        <ID>Microsoft.Windows.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SystemPerf">
+        <ID>System.Performance.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SystemCenter">
+        <ID>Microsoft.SystemCenter.Visualization.Library</ID>
+        <Version>7.1.10226.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="MicrosoftSystemCenterInstanceGroupLibrary7585010">
+        <ID>Microsoft.SystemCenter.InstanceGroup.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="System">
+        <ID>System.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="ComponentRequiredReference1">
+        <ID>Microsoft.SystemCenter.Image.Library</ID>
+        <Version>7.1.10226.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SC">
+        <ID>Microsoft.SystemCenter.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Unix">
+        <ID>Microsoft.Unix.Library</ID>
+        <Version>7.5.1050.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SystemHealth">
+        <ID>System.Health.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+    </References>
+  </Manifest>
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+        <ClassType ID="PostgresMP.Unix.Application" Comment="Postgres On Unix" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.LocalApplication" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="info" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="psqlPath" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+        <ClassType ID="PostgresMP.Unix.DataBase" Comment="Postgres Database on Unix" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="Dbname" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="hostName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+        <ClassType ID="PostgresMP.Unix.Table" Comment="Postgres Table on Unix" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="TableName" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="DBName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+      </ClassTypes>
+      <RelationshipTypes>
+        <RelationshipType ID="PostgresMp.AppHasDB" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Unix.Application" />
+          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Unix.DataBase" />
+        </RelationshipType>
+        <RelationshipType ID="PostgresMp.DBhasTable" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Unix.DataBase" />
+          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Unix.Table" />
+        </RelationshipType>
+      </RelationshipTypes>
+    </EntityTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Discoveries>
+      <Discovery ID="PostgresMP.Unix.ApplicationDiscovery" Enabled="true" Target="Unix!Microsoft.Unix.Computer" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="PostgresMP.Unix.Application" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
+          <Interval>180</Interval>
+          <TargetSystem>$Target/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</TargetSystem>
+          <ShellScript>
+				#!/bin/sh				
+				if pgrep postgres &gt; /dev/null
+				then
+					DATABASE=postgres
+					USERNAME=postgres
+					echo "$1;""$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -c "select version()")"
+				else
+					exit 1
+				fi
+		  </ShellScript>
+          <ScriptArguments>/opt/PostgreSQL/*/bin</ScriptArguments>
+          <Timeout>30</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <PSScriptName>ATEST.ps1</PSScriptName>
+          <PSScriptBody>
+				param([string]$StdOut,[string]$StdErr,[string]$ReturnCode)
+				$StdOut = $StdOut -replace '\n',''
+				if ($ReturnCode -eq "0" -And $StdErr.Length -eq 0){
+					$splited = $StdOut.Replace(" ","_").Split(";")
+					$version = $splited[1]
+					$path = $splited[0]
+					$api = New-Object -comObject 'MOM.ScriptAPI'
+					$bag = $api.CreatePropertyBag()
+					$bag.AddValue("info","$version")
+					$bag.AddValue("psqlPath","$path")
+					$bag
+				} elseif ($ReturnCode -eq "0" -And $StdErr.Length -ge 0) {
+					$api = New-Object -comObject 'MOM.ScriptAPI'
+					$bag = $api.CreatePropertyBag()
+					$bag.AddValue("info","$StdErr")
+					$bag.AddValue("psqlPath","path to psql may be wrong")
+					$bag
+				}
+		  </PSScriptBody>
+          <FilterExpression />
+          <ClassId>$MPElement[Name="PostgresMP.Unix.Application"]$</ClassId>
+          <InstanceSettings>
+            <Settings>
+              <Setting>
+                <Name>$MPElement[Name='Unix!Microsoft.Unix.Computer']/PrincipalName$</Name>
+                <Value>$Target/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.Application']/info$</Name>
+                <Value>$Data/Property[@Name='info']$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.Application']/psqlPath$</Name>
+                <Value>$Data/Property[@Name='psqlPath']$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='System!System.Entity']/DisplayName$</Name>
+                <Value>PostgreSQL</Value>
+              </Setting>
+            </Settings>
+          </InstanceSettings>
+        </DataSource>
+      </Discovery>
+      <Discovery ID="PostgresMP.Unix.DataBaseDiscovery" Enabled="true" Target="PostgresMP.Unix.Application" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="PostgresMP.Unix.DataBase" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
+          <Interval>180</Interval>
+          <TargetSystem>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</TargetSystem>
+          <ShellScript>
+				#!/bin/sh	
+				DATABASE=postgres
+				USERNAME=postgres
+				$1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A --record-separator=";" -c "SELECT pg_database.datname from pg_database where datistemplate='f'"
+		  </ShellScript>
+          <ScriptArguments>$Target/Property[Type="PostgresMP.Unix.Application"]/psqlPath$</ScriptArguments>
+          <Timeout>30</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <PSScriptName>ATEST11.ps1</PSScriptName>
+          <PSScriptBody>
+				param([string]$StdOut,[string]$StdErr,[string]$ReturnCode)
+				$StdOut = $StdOut -replace '\n',''
+				if ($ReturnCode -eq "0"){
+					$api = New-Object -comObject 'MOM.ScriptAPI'
+					$StdOut.Split(";") | ForEach {
+						$nospace = $_.Replace(" ","_")
+						$bag = $api.CreatePropertyBag()
+						$bag.AddValue("NoSpaseName","$nospace")
+						$bag.AddValue("Dbname","$_")
+						$bag
+					}
+				}
+		  </PSScriptBody>
+          <FilterExpression />
+          <ClassId>$MPElement[Name="PostgresMP.Unix.DataBase"]$</ClassId>
+          <InstanceSettings>
+            <Settings>
+              <Setting>
+                <Name>$MPElement[Name='Unix!Microsoft.Unix.Computer']/PrincipalName$</Name>
+                <Value>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.DataBase']/Dbname$</Name>
+                <Value>$Data/Property[@Name='Dbname']$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.DataBase']/hostName$</Name>
+                <Value>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='System!System.Entity']/DisplayName$</Name>
+                <Value>$Data/Property[@Name='NoSpaseName']$</Value>
+              </Setting>
+            </Settings>
+          </InstanceSettings>
+        </DataSource>
+      </Discovery>
+      <Discovery ID="PostgresMP.Unix.TableDiscovery" Enabled="true" Target="PostgresMP.Unix.DataBase" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="PostgresMP.Unix.Table" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
+          <Interval>1800</Interval>
+          <TargetSystem>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</TargetSystem>
+          <ShellScript>
+				#!/bin/sh	
+				DATABASE=$2
+				USERNAME=postgres
+				$1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A --record-separator=";" -c "SELECT table_name FROM information_schema.tables Where table_schema='public'"
+		  </ShellScript>
+          <ScriptArguments>$Target/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$"</ScriptArguments>
+          <Timeout>30</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <PSScriptName>ATESTTABLE.ps1</PSScriptName>
+          <PSScriptBody>
+				param([string]$StdOut,[string]$StdErr,[string]$ReturnCode)
+				$StdOut = $StdOut -replace '\n',''
+				if (($ReturnCode -eq "0") -and ($StdOut -ne "")){
+					$api = New-Object -comObject 'MOM.ScriptAPI'
+					$StdOut.Split(";") | ForEach {
+						$nospace = $_.Replace(" ","_")
+						$bag = $api.CreatePropertyBag()
+						$bag.AddValue("NoSpaseName","$nospace")
+						$bag.AddValue("TableName","$_")
+						$bag
+					}
+				}
+		  </PSScriptBody>
+          <FilterExpression />
+          <ClassId>$MPElement[Name="PostgresMP.Unix.Table"]$</ClassId>
+          <InstanceSettings>
+            <Settings>
+              <Setting>
+                <Name>$MPElement[Name='Unix!Microsoft.Unix.Computer']/PrincipalName$</Name>
+                <Value>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.Table']/TableName$</Name>
+                <Value>$Data/Property[@Name='TableName']$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.Table']/DBName$</Name>
+                <Value>$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.DataBase']/Dbname$</Name>
+                <Value>$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='System!System.Entity']/DisplayName$</Name>
+                <Value>$Data/Property[@Name='NoSpaseName']$</Value>
+              </Setting>
+            </Settings>
+          </InstanceSettings>
+        </DataSource>
+      </Discovery>
+    </Discoveries>
+	<Rules>
+		<Rule ID="PostgresMP.Unix.DataBaseConnectionsRule" Target="PostgresMP.Unix.DataBase" Enabled="false" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+		  <Category>PerformanceCollection</Category>
+		  <DataSources>
+			<DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.DataSource">
+			  <Interval>1800</Interval>
+			<TargetSystem>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</TargetSystem>
+			  <ShellScript>
+				##<![CDATA[
+				#!/bin/sh	
+				DATABASE=postgres
+				USERNAME=postgres
+				OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT COUNT(datid) FROM pg_database d LEFT JOIN pg_stat_activity s ON (s.datid = d.oid) WHERE d.datname = '$2'")
+				echo "$OUT"
+			   ]]> ##
+			  </ShellScript>
+			  <ScriptArguments>$Target/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$"</ScriptArguments>
+			  <Timeout>60</Timeout>
+			  <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+			  <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+			  <FilterExpression>
+			  </FilterExpression>
+			</DataSource>
+		  </DataSources>
+		  <ConditionDetection ID="Mapper" TypeID="SystemPerf!System.Performance.DataGenericMapper">
+			<ObjectName>Postgres.DataBase</ObjectName>
+			<CounterName>Counter</CounterName>
+			<InstanceName>$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$</InstanceName>
+			<Value>$Data///*[local-name()='StdOut']$</Value>
+		  </ConditionDetection>
+		  <WriteActions>
+			<WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+			<WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+		  </WriteActions>
+		</Rule>
+		<Rule ID="PostgresMP.Unix.TableInsersRule" Target="PostgresMP.Unix.Table" Enabled="false" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+		  <Category>PerformanceCollection</Category>
+		  <DataSources>
+			<DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.DataSource">
+			  <Interval>1800</Interval>
+			<TargetSystem>$Target/Host/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</TargetSystem>
+			  <ShellScript>
+				##<![CDATA[
+				#!/bin/sh	
+				DATABASE=$2
+				USERNAME=postgres
+				OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT n_tup_ins from pg_stat_user_tables Where relname='$3'")
+				echo "$OUT"
+			   ]]> ##
+			  </ShellScript>
+			  <ScriptArguments>$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$" "$Target/Property[Type="PostgreMP.Unix.Table"]/TableName$"</ScriptArguments>
+			  <Timeout>60</Timeout>
+			  <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+			  <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+			  <FilterExpression>
+			  </FilterExpression>
+			</DataSource>
+		  </DataSources>
+		  <ConditionDetection ID="Mapper" TypeID="SystemPerf!System.Performance.DataGenericMapper">
+			<ObjectName>Postgres.Unix.Table</ObjectName>
+			<CounterName>Counter</CounterName>
+			<InstanceName>$Target/Property[Type="PostgreMP.Unix.Table"]/TableName$</InstanceName>
+			<Value>$Data///*[local-name()='StdOut']$</Value>
+		  </ConditionDetection>
+		  <WriteActions>
+			<WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+			<WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+		  </WriteActions>
+		</Rule>
+		<Rule ID="PostgresMP.Unix.TableUpdatesRule" Target="PostgresMP.Unix.Table" Enabled="false" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+		  <Category>PerformanceCollection</Category>
+		  <DataSources>
+			<DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.DataSource">
+			  <Interval>1800</Interval>
+			<TargetSystem>$Target/Host/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</TargetSystem>
+			  <ShellScript>
+				##<![CDATA[
+				#!/bin/sh	
+				DATABASE=$2
+				USERNAME=postgres
+				OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT n_tup_upd from pg_stat_user_tables Where relname='$3'")
+				echo "$OUT"
+			   ]]> ##
+			  </ShellScript>
+			  <ScriptArguments>$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$" "$Target/Property[Type="PostgreMP.Unix.Table"]/TableName$"</ScriptArguments>
+			  <Timeout>60</Timeout>
+			  <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+			  <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+			  <FilterExpression>
+			  </FilterExpression>
+			</DataSource>
+		  </DataSources>
+		  <ConditionDetection ID="Mapper" TypeID="SystemPerf!System.Performance.DataGenericMapper">
+			<ObjectName>Postgres.Unix.Table</ObjectName>
+			<CounterName>Counter</CounterName>
+			<InstanceName>$Target/Property[Type="PostgreMP.Unix.Table"]/TableName$</InstanceName>
+			<Value>$Data///*[local-name()='StdOut']$</Value>
+		  </ConditionDetection>
+		  <WriteActions>
+			<WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+			<WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+		  </WriteActions>
+		</Rule>
+		<Rule ID="PostgresMP.Unix.TableDeletesRule" Target="PostgresMP.Unix.Table" Enabled="false" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+		  <Category>PerformanceCollection</Category>
+		  <DataSources>
+			<DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.DataSource">
+			  <Interval>1800</Interval>
+			<TargetSystem>$Target/Host/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</TargetSystem>
+			  <ShellScript>
+				##<![CDATA[
+				#!/bin/sh	
+				DATABASE=$2
+				USERNAME=postgres
+				OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT n_tup_del from pg_stat_user_tables Where relname='$3'")
+				echo "$OUT"
+			   ]]> ##
+			  </ShellScript>
+			  <ScriptArguments>$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$" "$Target/Property[Type="PostgreMP.Unix.Table"]/TableName$"</ScriptArguments>
+			  <Timeout>60</Timeout>
+			  <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+			  <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+			  <FilterExpression>
+			  </FilterExpression>
+			</DataSource>
+		  </DataSources>
+		  <ConditionDetection ID="Mapper" TypeID="SystemPerf!System.Performance.DataGenericMapper">
+			<ObjectName>Postgres.Unix.Table</ObjectName>
+			<CounterName>Counter</CounterName>
+			<InstanceName>$Target/Property[Type="PostgreMP.Unix.Table"]/TableName$</InstanceName>
+			<Value>$Data///*[local-name()='StdOut']$</Value>
+		  </ConditionDetection>
+		  <WriteActions>
+			<WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+			<WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+		  </WriteActions>
+		</Rule>
+	</Rules>
+	<Monitors>
+      <UnitMonitor ID="PostgresMP.Unix.ConnectionAvaliableMonitor" Accessibility="Internal" Enabled="true" Target="PostgresMP.Unix.Application" ParentMonitorID="SystemHealth!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="UnixAuth!Unix.Authoring.ShellScript.MatchesRegExp.ThreeState.MonitorType" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="PostgresMP.Unix.ConnectionAvaliableMonitor.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</AlertParameter1>
+            <!-- <AlertParameter2>$Data/Context///*[local-name()="StdOut"]$</AlertParameter2> -->
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="StatusOK" MonitorTypeStateID="StatusOK" HealthState="Success" />
+          <OperationalState ID="StatusWarning" MonitorTypeStateID="StatusWarning" HealthState="Warning" />
+          <OperationalState ID="StatusError" MonitorTypeStateID="StatusError" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <Interval>1800</Interval>
+          <TargetSystem>
+					$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$
+		  </TargetSystem>
+          <ShellScript>
+					#!/bin/sh	
+					DATABASE=postgres
+					USERNAME=postgres
+					OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT version()")
+					if [ -n "$OUT" ]; then
+						echo "OK"
+					else
+						echo "ERROR"
+					fi
+				</ShellScript>
+          <ScriptArguments>$Target/Property[Type="PostgresMP.Unix.Application"]/psqlPath$</ScriptArguments>
+          <Timeout>60</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <ErrorRegExp>^ERROR</ErrorRegExp>
+          <WarningRegExp>^Warning</WarningRegExp>
+        </Configuration>
+      </UnitMonitor>
+	  <UnitMonitor ID="PostgresMP.Unix.TransactionPercent" Accessibility="Internal" Enabled="true" Target="PostgresMP.Unix.DataBase" ParentMonitorID="SystemHealth!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="UnixAuth!Unix.Authoring.ShellScript.MatchesRegExp.ThreeState.MonitorType" ConfirmDelivery="false">
+        <Category>PerformanceHealth</Category>
+        <AlertSettings AlertMessage="PostgresMP.Unix.TransactionPercent.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</AlertParameter1>
+            <AlertParameter2>$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$</AlertParameter2>
+            <AlertParameter3>$Data/Context///*[local-name()="StdOut"]$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="StatusOK" MonitorTypeStateID="StatusOK" HealthState="Success" />
+          <OperationalState ID="StatusWarning" MonitorTypeStateID="StatusWarning" HealthState="Warning" />
+          <OperationalState ID="StatusError" MonitorTypeStateID="StatusError" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <Interval>1800</Interval>
+          <TargetSystem>
+					$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$
+		  </TargetSystem>
+          <ShellScript>
+					#!/bin/sh	
+					DATABASE=postgres
+					USERNAME=postgres
+					OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT round(100.*sd.xact_commit/(sd.xact_commit+sd.xact_rollback), 0) AS commitratio FROM pg_stat_database sd JOIN pg_database d ON (d.oid=sd.datid) JOIN pg_user u ON (u.usesysid=d.datdba) WHERE sd.xact_commit+sd.xact_rollback&lt;&gt;0 AND d.datname = '$2'")
+					if [ $OUT -lt 75 ]; then
+						echo "ERROR"$OUT
+					elif [ $OUT -le 90] &amp;&amp; [ $OUT -ge 75]; then
+						echo "WARNING"$OUT
+					else
+						echo "OK"
+					fi
+				</ShellScript>
+          <ScriptArguments>$Target/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$"</ScriptArguments>
+          <Timeout>60</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <ErrorRegExp>^ERROR</ErrorRegExp>
+          <WarningRegExp>^WARNING</WarningRegExp>
+        </Configuration>
+      </UnitMonitor>
+	  <UnitMonitor ID="PostgresMP.Unix.AutovacuumConfig" Accessibility="Internal" Enabled="true" Target="PostgresMP.Unix.Application" ParentMonitorID="SystemHealth!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="UnixAuth!Unix.Authoring.ShellScript.MatchesRegExp.ThreeState.MonitorType" ConfirmDelivery="false">
+        <Category>ConfigurationHealth</Category>
+        <AlertSettings AlertMessage="PostgresMP.Unix.Autovacuum.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</AlertParameter1>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="StatusOK" MonitorTypeStateID="StatusOK" HealthState="Success" />
+          <OperationalState ID="StatusWarning" MonitorTypeStateID="StatusWarning" HealthState="Warning" />
+          <OperationalState ID="StatusError" MonitorTypeStateID="StatusError" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <Interval>1800</Interval>
+          <TargetSystem>
+					$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$
+		  </TargetSystem>
+          <ShellScript>
+					#!/bin/sh	
+					DATABASE=postgres
+					USERNAME=postgres
+					OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT setting From pg_settings WHere name='autovacuum'")
+					if [ $OUT -ne "on" ]; then
+						echo "ERROR"
+					fi
+				</ShellScript>
+          <ScriptArguments>$Target/Property[Type="PostgresMP.Unix.Application"]/psqlPath$</ScriptArguments>
+          <Timeout>60</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <ErrorRegExp>^ERROR</ErrorRegExp>
+          <WarningRegExp>^WARNING</WarningRegExp>
+        </Configuration>
+      </UnitMonitor>
+	  <UnitMonitor ID="PostgresMP.Unix.CacheHitPercent" Accessibility="Internal" Enabled="true" Target="PostgresMP.Unix.DataBase" ParentMonitorID="SystemHealth!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="UnixAuth!Unix.Authoring.ShellScript.MatchesRegExp.ThreeState.MonitorType" ConfirmDelivery="false">
+        <Category>ConfigurationHealth</Category>
+        <AlertSettings AlertMessage="PostgresMP.Unix.CacheHitPercent.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</AlertParameter1>
+            <AlertParameter2>$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$</AlertParameter2>
+            <AlertParameter3>$Data/Context///*[local-name()="StdOut"]$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="StatusOK" MonitorTypeStateID="StatusOK" HealthState="Success" />
+          <OperationalState ID="StatusWarning" MonitorTypeStateID="StatusWarning" HealthState="Warning" />
+          <OperationalState ID="StatusError" MonitorTypeStateID="StatusError" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <Interval>1800</Interval>
+          <TargetSystem>
+					$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$
+		  </TargetSystem>
+          <ShellScript>
+					#!/bin/sh	
+					DATABASE=postgres
+					USERNAME=postgres
+					OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT round(100.*sd.blks_hit/(sd.blks_read+sd.blks_hit), 2) AS dhitratio,  d.datname,  u.usename FROM pg_stat_database sd JOIN pg_database d ON (d.oid=sd.datid) JOIN pg_user u ON (u.usesysid=d.datdba) WHERE sd.blks_read+sd.blks_hit&lt;&gt;0 AND d.datname = '$2'")
+					if [ $OUT -lt 30 ]; then
+						echo "ERROR"$OUT
+					elif [ $OUT -le 70] &amp;&amp; [ $OUT -ge 30]; then
+						echo "WARNING"$OUT
+					else
+						echo "OK"
+					fi
+				</ShellScript>
+          <ScriptArguments>$Target/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$"</ScriptArguments>
+          <Timeout>60</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <ErrorRegExp>^ERROR</ErrorRegExp>
+          <WarningRegExp>^WARNING</WarningRegExp>
+        </Configuration>
+      </UnitMonitor>
+	  <UnitMonitor ID="PostgresMP.Unix.TableIndexHit" Accessibility="Internal" Enabled="false" Target="PostgresMP.Unix.Table" ParentMonitorID="SystemHealth!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="UnixAuth!Unix.Authoring.ShellScript.MatchesRegExp.ThreeState.MonitorType" ConfirmDelivery="false">
+        <Category>PerformanceHealth</Category>
+        <AlertSettings AlertMessage="PostgresMP.Unix.TableIndexHit.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</AlertParameter1>
+            <AlertParameter2>$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$</AlertParameter2>
+            <AlertParameter3>$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$</AlertParameter3>
+            <AlertParameter4>$Data/Context///*[local-name()="StdOut"]$</AlertParameter4>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="StatusOK" MonitorTypeStateID="StatusOK" HealthState="Success" />
+          <OperationalState ID="StatusWarning" MonitorTypeStateID="StatusWarning" HealthState="Warning" />
+          <OperationalState ID="StatusError" MonitorTypeStateID="StatusError" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <Interval>1800</Interval>
+          <TargetSystem>
+					$Target/Host/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$
+		  </TargetSystem>
+          <ShellScript>
+					#!/bin/sh	
+					DATABASE=$2
+					USERNAME=postgres
+					OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT CASE WHEN idx_scan = 0 THEN 100 ELSE seq_scan::float4 / idx_scan * 100 END AS ratio, relname, seq_scan, idx_scan FROM pg_stat_user_tables WHERE relname='$3'")
+					if [ $OUT -lt 30 ]; then
+						echo "WARNING"$OUT
+					else
+						echo "OK"
+					fi
+				</ShellScript>
+          <ScriptArguments>$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$" "$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$"</ScriptArguments>
+          <Timeout>60</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <ErrorRegExp>^ERROR</ErrorRegExp>
+          <WarningRegExp>^WARNING</WarningRegExp>
+        </Configuration>
+      </UnitMonitor>
+	  <UnitMonitor ID="PostgresMP.Unix.DataBaseConnections" Accessibility="Internal" Enabled="true" Target="PostgresMP.Unix.DataBase" ParentMonitorID="SystemHealth!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="UnixAuth!Unix.Authoring.ShellScript.MatchesRegExp.ThreeState.MonitorType" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="PostgresMP.Unix.DataBaseConnections.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</AlertParameter1>
+            <AlertParameter2>$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$</AlertParameter2>
+            <AlertParameter3>$Data/Context///*[local-name()="StdOut"]$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="StatusOK" MonitorTypeStateID="StatusOK" HealthState="Success" />
+          <OperationalState ID="StatusWarning" MonitorTypeStateID="StatusWarning" HealthState="Warning" />
+          <OperationalState ID="StatusError" MonitorTypeStateID="StatusError" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <Interval>1800</Interval>
+          <TargetSystem>
+					$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$
+		  </TargetSystem>
+          <ShellScript>
+					#!/bin/sh	
+					DATABASE=postgres
+					USERNAME=postgres
+					OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT COUNT(datid) AS current, (SELECT setting AS mc FROM pg_settings WHERE name = 'max_connections') AS mc, d.datname FROM pg_database d LEFT JOIN pg_stat_activity s ON (s.datid = d.oid) WHERE d.datname = '$2' GROUP BY 2,3 ")
+					if [ $OUT -gt 93 ]; then
+						echo "ERROR"$OUT"%"
+					elif [ $OUT -le 93] &amp;&amp; [ $OUT -ge 85]; then
+						echo "WARNING"$OUT"%"
+					else
+						echo "OK"
+					fi
+				</ShellScript>
+          <ScriptArguments>$Target/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$"</ScriptArguments>
+          <Timeout>60</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <ErrorRegExp>^ERROR</ErrorRegExp>
+          <WarningRegExp>^WARNING</WarningRegExp>
+        </Configuration>
+      </UnitMonitor>
+    </Monitors>
+  </Monitoring>
+  <Presentation>
+    <Views>
+      <View ID="View_64adf0509028499a832828f6361b8a33" Accessibility="Public" Enabled="true" Target="PostgresMP.Unix.Application" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <InMaintenanceMode>false</InMaintenanceMode>
+        </Criteria>
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>State</Name>
+            <Id>PostgresMP.Unix.Application-*-2754299b-8922-ce7f-d3cf-d18b5adecbd0-*-Health</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>System.Entity/DisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>info</Name>
+            <Id>PostgresMP.Unix.Application/info</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>psqlPath</Name>
+            <Id>PostgresMP.Unix.Application/psqlPath</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="7" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>PostgresMP.Unix.DataBase</Name>
+            <Id>PostgresMP.Unix.DataBase</Id>
+          </ColumnInfo>
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_6fd0f7c0c44b42ddacd40c6325135d49" Accessibility="Public" Enabled="true" Target="PostgresMP.Unix.DataBase" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <InMaintenanceMode>false</InMaintenanceMode>
+        </Criteria>
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>State</Name>
+            <Id>PostgresMP.Unix.DataBase-*-9bd793f1-8312-973c-ecb6-f0c8504a3cec-*-Health</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>System.Entity/DisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Dbname</Name>
+            <Id>PostgresMP.Unix.DataBase/Dbname</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>hostName</Name>
+            <Id>PostgresMP.Unix.DataBase/hostName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="7" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>PostgresMP.Unix.Table</Name>
+            <Id>PostgresMP.Unix.Table</Id>
+          </ColumnInfo>
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_d6ebf87ac3a746f4a6997c1a0a6a40e6" Accessibility="Public" Enabled="true" Target="PostgresMP.Unix.Table" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <InMaintenanceMode>false</InMaintenanceMode>
+        </Criteria>
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>State</Name>
+            <Id>PostgresMP.Unix.Table-*-3c3a8a50-53a6-28e4-9129-88c1e3d64af4-*-Health</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>System.Entity/DisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>TableName</Name>
+            <Id>PostgresMP.Unix.Table/TableName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DBName</Name>
+            <Id>PostgresMP.Unix.Table/DBName</Id>
+          </ColumnInfo>
+        </Presentation>
+        <Target />
+      </View>
+    </Views>
+    <Folders>
+      <Folder ID="Folder_60633f2750b246e598d11d6961e7c7f4" Accessibility="Public" ParentFolder="SC!Microsoft.SystemCenter.Monitoring.ViewFolder.Root" />
+    </Folders>
+    <FolderItems>
+      <FolderItem ElementID="View_64adf0509028499a832828f6361b8a33" ID="if89969a8322549dfb5d5eaeacf70c48d" Folder="Folder_60633f2750b246e598d11d6961e7c7f4" />
+      <FolderItem ElementID="View_6fd0f7c0c44b42ddacd40c6325135d49" ID="ib2e949f14f494d809aeb39ad1af99263" Folder="Folder_60633f2750b246e598d11d6961e7c7f4" />
+      <FolderItem ElementID="View_d6ebf87ac3a746f4a6997c1a0a6a40e6" ID="i6e0910b025b5494ea26ccd93d8f9e0d2" Folder="Folder_60633f2750b246e598d11d6961e7c7f4" />
+    </FolderItems>
+    <StringResources>
+      <StringResource ID="PostgresMP.Unix.ConnectionAvaliableMonitor.AlertMessage" />
+      <StringResource ID="PostgresMP.Unix.TransactionPercent.AlertMessage" />
+      <StringResource ID="PostgresMP.Unix.CacheHitPercent.AlertMessage" />
+      <StringResource ID="PostgresMP.Unix.DataBaseConnections.AlertMessage" />
+      <StringResource ID="PostgresMP.Unix.TableIndexHit.AlertMessage" />
+      <StringResource ID="PostgresMP.Unix.Autovacuum.AlertMessage" />
+    </StringResources>
+  </Presentation>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="false">
+      <DisplayStrings>
+        <DisplayString ElementID="Folder_60633f2750b246e598d11d6961e7c7f4">
+          <Name>atest</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_64adf0509028499a832828f6361b8a33">
+          <Name>view</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor.AlertMessage">
+          <Name>ApplicationAvaliable</Name>
+          <Description>No connection to PostgreSQL on {0}</Description>
+        </DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TransactionPercent.AlertMessage">
+          <Name>TransactionPercent</Name>
+          <Description>Successfull transaction percent on {0} in {1} is low ({2})</Description>
+        </DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.CacheHitPercent.AlertMessage">
+          <Name>CacheHitPercent</Name>
+          <Description>cachehit percent on {0} in {1} is low ({2})</Description>
+        </DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.DataBaseConnections.AlertMessage">
+          <Name>DataBaseConnections</Name>
+          <Description>Database connection pool is about to finish computer: {0} databse: {1} status: {2}</Description>
+        </DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.Autovacuum.AlertMessage">
+          <Name>Autovacuum</Name>
+          <Description>Autovacuum on {0} is off</Description>
+        </DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableIndexHit.AlertMessage">
+          <Name>TableIndexHit</Name>
+          <Description>Table Index Hit percent on {0} in database:{1} of table {2} is low ({3})</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_6fd0f7c0c44b42ddacd40c6325135d49">
+          <Name>db</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_d6ebf87ac3a746f4a6997c1a0a6a40e6">
+          <Name>tb</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor">
+          <Name>ConnectionAvaliable</Name>
+          <Description />
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor" SubElementID="StatusError">
+          <Name>StatusError</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor" SubElementID="StatusWarning">
+          <Name>StatusWarning</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor" SubElementID="StatusOK">
+          <Name>StatusOK</Name>
+        </DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule">
+			<Name>PostgresUnixDBConnectionsRule</Name>
+			<Description>description</Description>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule" SubElementID="DS">
+			<Name>Script Performance Data Provider</Name>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule" SubElementID="WriteToDW">
+			<Name>Performance data publisher</Name>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule" SubElementID="WriteToDB">
+			<Name>Performance Data Collection Write Action</Name>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableInsersRuleRule">
+			<Name>PostgresUnixTableInsersRuleRule</Name>
+			<Description>description</Description>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableInsersRuleRule" SubElementID="DS">
+			<Name>Script Performance Data Provider</Name>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableInsersRuleRule" SubElementID="WriteToDW">
+			<Name>Performance data publisher</Name>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableInsersRuleRule" SubElementID="WriteToDB">
+			<Name>Performance Data Collection Write Action</Name>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule">
+			<Name>PostgresUnixTableUpdatesRule</Name>
+			<Description>description</Description>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule" SubElementID="DS">
+			<Name>Script Performance Data Provider</Name>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule" SubElementID="WriteToDW">
+			<Name>Performance data publisher</Name>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule" SubElementID="WriteToDB">
+			<Name>Performance Data Collection Write Action</Name>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableDeletesRule">
+			<Name>PostgresUnixTableDeletesRule</Name>
+			<Description>description</Description>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableDeletesRule" SubElementID="DS">
+			<Name>Script Performance Data Provider</Name>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableDeletesRule" SubElementID="WriteToDW">
+			<Name>Performance data publisher</Name>
+		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.TableDeletesRule" SubElementID="WriteToDB">
+			<Name>Performance Data Collection Write Action</Name>
+		</DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPack>
