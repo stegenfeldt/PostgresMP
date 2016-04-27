@@ -95,6 +95,75 @@
         </RelationshipType>
       </RelationshipTypes>
     </EntityTypes>
+	<ModuleTypes>
+		<DataSourceModuleType ID="PostgresMP.Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource" Accessibility="Public" Batching="false">
+		  <Configuration>
+			<IncludeSchemaTypes>
+			  <SchemaType>System!System.Discovery.MapperSchema</SchemaType>
+			  <SchemaType>System!System.ExpressionEvaluatorSchema</SchemaType>
+			</IncludeSchemaTypes>
+			<xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Interval" type="xsd:integer" minOccurs="1"/>
+			<xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="TargetSystem" type="xsd:string" minOccurs="1"/>
+			<xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="ShellScript" type="xsd:string" minOccurs="1"/>
+			<xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="ScriptArguments" type="xsd:string" minOccurs="1"/>
+			<xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Timeout" type="xsd:integer" minOccurs="1"/>
+			<xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="UserName" type="xsd:string" minOccurs="1"/>
+			<xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Password" type="xsd:string" minOccurs="1"/>
+			<xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="PSScriptName" type="xsd:string" minOccurs="1"/>
+			<xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="PSScriptBody" type="xsd:string" minOccurs="1"/>
+			<xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="FilterExpression" type="ExpressionType" minOccurs="1"/>
+			<xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="ClassId" type="xsd:string" minOccurs="1"/>
+			<xsd:element xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="InstanceSettings" type="SettingsType" minOccurs="1"/>
+		  </Configuration>
+		  <OverrideableParameters>
+			<OverrideableParameter ID="Interval" Selector="$Config/Interval$" ParameterType="int"/>
+			<OverrideableParameter ID="Timeout" Selector="$Config/Timeout$" ParameterType="int"/>
+			<OverrideableParameter ID="ScriptArguments" Selector="$Config/ScriptArguments$" ParameterType="string"/>
+		  </OverrideableParameters>
+		  <ModuleImplementation Isolation="Any">
+			<Composite>
+			  <MemberModules>
+				<DataSource ID="Scheduler" TypeID="System!System.Discovery.Scheduler">
+				  <Scheduler>
+					<SimpleReccuringSchedule>
+					  <Interval>$Config/Interval$</Interval>
+					  <SyncTime/>
+					</SimpleReccuringSchedule>
+					<ExcludeDates/>
+				  </Scheduler>
+				</DataSource>
+				<ProbeAction ID="InvokeProbe" TypeID="UnixAuth!Unix.Authoring.ShellScript.PropertyBag.ProbeAction">
+				  <TargetSystem>$Config/TargetSystem$</TargetSystem>
+				  <ShellScript>$Config/ShellScript$</ShellScript>
+				  <ScriptArguments>$Config/ScriptArguments$</ScriptArguments>
+				  <Timeout>$Config/Timeout$</Timeout>
+				  <UserName>$Config/UserName$</UserName>
+				  <Password>$Config/Password$</Password>
+				  <PSScriptName>$Config/PSScriptName$</PSScriptName>
+				  <PSScriptBody>$Config/PSScriptBody$</PSScriptBody>
+				</ProbeAction>
+				<ConditionDetection ID="Filter" TypeID="System!System.ExpressionFilter">
+				  <Expression>$Config/FilterExpression$</Expression>
+				</ConditionDetection>
+				<ConditionDetection ID="Mapper" TypeID="System!System.Discovery.ClassSnapshotDataMapper">
+				  <ClassId>$Config/ClassId$</ClassId>
+				  <InstanceSettings>$Config/InstanceSettings$</InstanceSettings>
+				</ConditionDetection>
+			  </MemberModules>
+			  <Composition>
+				<Node ID="Mapper">
+				  <Node ID="Filter">
+					<Node ID="InvokeProbe">
+					  <Node ID="Scheduler"/>
+					</Node>
+				  </Node>
+				</Node>
+			  </Composition>
+			</Composite>
+		  </ModuleImplementation>
+		  <OutputType>System!System.Discovery.Data</OutputType>
+		</DataSourceModuleType>
+	</ModuleTypes>
   </TypeDefinitions>
   <Monitoring>
     <Discoveries>
@@ -103,7 +172,7 @@
         <DiscoveryTypes>
           <DiscoveryClass TypeID="PostgresMP.Unix.Application" />
         </DiscoveryTypes>
-        <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
+        <DataSource ID="DS" TypeID="PostgresMP.Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
           <Interval>180</Interval>
           <TargetSystem>$Target/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</TargetSystem>
           <ShellScript>
@@ -335,7 +404,7 @@
 				echo "$OUT"
 			   ]]> ##
 			  </ShellScript>
-			  <ScriptArguments>$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$" "$Target/Property[Type="PostgreMP.Unix.Table"]/TableName$"</ScriptArguments>
+			  <ScriptArguments>$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$" "$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$"</ScriptArguments>
 			  <Timeout>60</Timeout>
 			  <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
 			  <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
@@ -346,7 +415,7 @@
 		  <ConditionDetection ID="Mapper" TypeID="SystemPerf!System.Performance.DataGenericMapper">
 			<ObjectName>Postgres.Unix.Table</ObjectName>
 			<CounterName>Counter</CounterName>
-			<InstanceName>$Target/Property[Type="PostgreMP.Unix.Table"]/TableName$</InstanceName>
+			<InstanceName>$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$</InstanceName>
 			<Value>$Data///*[local-name()='StdOut']$</Value>
 		  </ConditionDetection>
 		  <WriteActions>
@@ -369,7 +438,7 @@
 				echo "$OUT"
 			   ]]> ##
 			  </ShellScript>
-			  <ScriptArguments>$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$" "$Target/Property[Type="PostgreMP.Unix.Table"]/TableName$"</ScriptArguments>
+			  <ScriptArguments>$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$" "$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$"</ScriptArguments>
 			  <Timeout>60</Timeout>
 			  <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
 			  <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
@@ -380,7 +449,7 @@
 		  <ConditionDetection ID="Mapper" TypeID="SystemPerf!System.Performance.DataGenericMapper">
 			<ObjectName>Postgres.Unix.Table</ObjectName>
 			<CounterName>Counter</CounterName>
-			<InstanceName>$Target/Property[Type="PostgreMP.Unix.Table"]/TableName$</InstanceName>
+			<InstanceName>$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$</InstanceName>
 			<Value>$Data///*[local-name()='StdOut']$</Value>
 		  </ConditionDetection>
 		  <WriteActions>
@@ -403,7 +472,7 @@
 				echo "$OUT"
 			   ]]> ##
 			  </ShellScript>
-			  <ScriptArguments>$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$" "$Target/Property[Type="PostgreMP.Unix.Table"]/TableName$"</ScriptArguments>
+			  <ScriptArguments>$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$ "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/Dbname$" "$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$"</ScriptArguments>
 			  <Timeout>60</Timeout>
 			  <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
 			  <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
@@ -414,7 +483,7 @@
 		  <ConditionDetection ID="Mapper" TypeID="SystemPerf!System.Performance.DataGenericMapper">
 			<ObjectName>Postgres.Unix.Table</ObjectName>
 			<CounterName>Counter</CounterName>
-			<InstanceName>$Target/Property[Type="PostgreMP.Unix.Table"]/TableName$</InstanceName>
+			<InstanceName>$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$</InstanceName>
 			<Value>$Data///*[local-name()='StdOut']$</Value>
 		  </ConditionDetection>
 		  <WriteActions>
@@ -884,17 +953,17 @@
 		<DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule" SubElementID="WriteToDB">
 			<Name>Performance Data Collection Write Action</Name>
 		</DisplayString>
-		<DisplayString ElementID="PostgresMP.Unix.TableInsersRuleRule">
+		<DisplayString ElementID="PostgresMP.Unix.TableInsersRule">
 			<Name>PostgresUnixTableInsersRuleRule</Name>
 			<Description>description</Description>
 		</DisplayString>
-		<DisplayString ElementID="PostgresMP.Unix.TableInsersRuleRule" SubElementID="DS">
+		<DisplayString ElementID="PostgresMP.Unix.TableInsersRule" SubElementID="DS">
 			<Name>Script Performance Data Provider</Name>
 		</DisplayString>
-		<DisplayString ElementID="PostgresMP.Unix.TableInsersRuleRule" SubElementID="WriteToDW">
+		<DisplayString ElementID="PostgresMP.Unix.TableInsersRule" SubElementID="WriteToDW">
 			<Name>Performance data publisher</Name>
 		</DisplayString>
-		<DisplayString ElementID="PostgresMP.Unix.TableInsersRuleRule" SubElementID="WriteToDB">
+		<DisplayString ElementID="PostgresMP.Unix.TableInsersRule" SubElementID="WriteToDB">
 			<Name>Performance Data Collection Write Action</Name>
 		</DisplayString>
 		<DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule">

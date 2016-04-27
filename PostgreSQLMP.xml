@@ -61,14 +61,14 @@
   <TypeDefinitions>
     <EntityTypes>
       <ClassTypes>
-        <ClassType ID="PostgreMP.Windows.Application" Comment="Application comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.LocalApplication" Hosted="true" Singleton="false" Extension="false">
+        <ClassType ID="PostgresMP.Windows.Application" Comment="Application comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.LocalApplication" Hosted="true" Singleton="false" Extension="false">
           <Property ID="Info" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
-        <ClassType ID="PostgreMP.Windows.Database" Comment="database comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+        <ClassType ID="PostgresMP.Windows.DataBase" Comment="database comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
           <Property ID="Dbname" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
           <Property ID="hostName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
-        <ClassType ID="PostgreMP.Windows.Table" Comment="table comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+        <ClassType ID="PostgresMP.Windows.Table" Comment="table comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
           <Property ID="Dbname" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
           <Property ID="TableName" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
@@ -76,12 +76,12 @@
       </ClassTypes>
       <RelationshipTypes>
         <RelationshipType ID="ApplHostsApplicationComponent" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
-          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="PostgreMP.Windows.Application" />
-          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="PostgreMP.Windows.Database" />
+          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Windows.Application" />
+          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Windows.DataBase" />
         </RelationshipType>
         <RelationshipType ID="DataBaseHostsTable" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
-          <Source ID="Database" MinCardinality="0" MaxCardinality="2147483647" Type="PostgreMP.Windows.Database" />
-          <Target ID="Table" MinCardinality="0" MaxCardinality="2147483647" Type="PostgreMP.Windows.Table" />
+          <Source ID="Database" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Windows.DataBase" />
+          <Target ID="Table" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Windows.Table" />
         </RelationshipType>
       </RelationshipTypes>
     </EntityTypes>
@@ -91,7 +91,7 @@
       <Discovery ID="PostgreMP.Windows.ApplDiscovery" Enabled="true" Target="Windows!Microsoft.Windows.Computer" ConfirmDelivery="false" Remotable="true" Priority="Normal">
         <Category>Discovery</Category>
         <DiscoveryTypes>
-          <DiscoveryClass TypeID="PostgreMP.Windows.Application" />
+          <DiscoveryClass TypeID="PostgresMP.Windows.Application" />
         </DiscoveryTypes>
         <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.DiscoveryProvider">
           <IntervalSeconds>14400</IntervalSeconds>
@@ -139,9 +139,9 @@
 				rs.close
 				
 				Dim oInstance
-				Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='PostgreMP.Windows.Application']$")
+				Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='PostgresMP.Windows.Application']$")
 				Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
-				Call oInstance.AddProperty("$MPElement[Name='PostgreMP.Windows.Application']/Info$", version)
+				Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.Application']/Info$", version)
 				Call oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", "PostgreSQL")
 				Call oDiscoveryData.AddInstance(oInstance)
 				conn.Close
@@ -151,10 +151,10 @@
           <TimeoutSeconds>300</TimeoutSeconds>
         </DataSource>
       </Discovery>
-      <Discovery ID="PostgreMP.Windows.DatabaseDiscovery" Enabled="true" Target="PostgreMP.Windows.Application" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+      <Discovery ID="PostgresMP.Windows.DataBaseDiscovery" Enabled="true" Target="PostgresMP.Windows.Application" ConfirmDelivery="false" Remotable="true" Priority="Normal">
         <Category>Discovery</Category>
         <DiscoveryTypes>
-          <DiscoveryClass TypeID="PostgreMP.Windows.Database" />
+          <DiscoveryClass TypeID="PostgresMP.Windows.DataBase" />
         </DiscoveryTypes>
         <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.DiscoveryProvider">
           <IntervalSeconds>14400</IntervalSeconds>
@@ -190,10 +190,10 @@
 			do until rs.EOF
 			  version = rs.Fields(0).value
 			  Dim oInstance
-			  Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='PostgreMP.Windows.Database']$")
+			  Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='PostgresMP.Windows.DataBase']$")
 			  Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
-			  Call oInstance.AddProperty("$MPElement[Name='PostgreMP.Windows.Database']/Dbname$", version) 
-			  Call oInstance.AddProperty("$MPElement[Name='PostgreMP.Windows.Database']/hostName$", sComputerName) 
+			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.DataBase']/Dbname$", version) 
+			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.DataBase']/hostName$", sComputerName) 
 			  Call oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", version) 
 			  Call oDiscoveryData.AddInstance(oInstance)
 			  rs.MoveNext
@@ -206,16 +206,16 @@
           <TimeoutSeconds>300</TimeoutSeconds>
         </DataSource>
       </Discovery>
-      <Discovery ID="PostgreMP.Windows.TableDiscovery" Enabled="true" Target="PostgreMP.Windows.Database" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+      <Discovery ID="PostgresMP.Windows.TableDiscovery" Enabled="true" Target="PostgresMP.Windows.DataBase" ConfirmDelivery="false" Remotable="true" Priority="Normal">
         <Category>Discovery</Category>
         <DiscoveryTypes>
-          <DiscoveryClass TypeID="PostgreMP.Windows.Table" />
+          <DiscoveryClass TypeID="PostgresMP.Windows.Table" />
         </DiscoveryTypes>
         <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.DiscoveryProvider">
           <IntervalSeconds>144000</IntervalSeconds>
           <SyncTime />
           <ScriptName>PostgresdbDiscovery.vbs</ScriptName>
-          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ $Target/Property[Type="PostgreMP.Windows.Database"]/Dbname$</Arguments>
+          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ $Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$</Arguments>
           <ScriptBody>
 			Option Explicit
 			
@@ -246,11 +246,11 @@
 			do until rs.EOF
 			  version = rs.Fields(0).value
 			  Dim oInstance
-			  Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='PostgreMP.Windows.Table']$")
+			  Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='PostgresMP.Windows.Table']$")
 			  Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
-			  Call oInstance.AddProperty("$MPElement[Name='PostgreMP.Windows.Database']/Dbname$", DbName) 
-			  Call oInstance.AddProperty("$MPElement[Name='PostgreMP.Windows.Table']/Dbname$", DbName) 
-			  Call oInstance.AddProperty("$MPElement[Name='PostgreMP.Windows.Table']/TableName$", version) 
+			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.DataBase']/Dbname$", DbName) 
+			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.Table']/Dbname$", DbName) 
+			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.Table']/TableName$", version) 
 			  Call oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", version) 
 			  Call oDiscoveryData.AddInstance(oInstance)
 			  rs.MoveNext
@@ -309,14 +309,14 @@ Call oAPI.Return(oBag)
           <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
         </WriteActions>
       </Rule>	
-      <Rule ID="PostgreMP.Windows.TableInsersRule" Enabled="false" Target="PostgreMP.Windows.Table" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+      <Rule ID="PostgresMP.Windows.TableInsersRule" Enabled="false" Target="PostgresMP.Windows.Table" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
         <Category>PerformanceCollection</Category>
         <DataSources>
           <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.PerformanceProvider">
             <IntervalSeconds>7200</IntervalSeconds>
             <SyncTime />
             <ScriptName>TableInserts.vbs</ScriptName>
-            <Arguments>$Target/Property[Type="PostgreMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgreMP.Windows.Table"]/TableName$</Arguments>
+            <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$</Arguments>
             <ScriptBody>Dim dbName,tableName
 dbName = WScript.Arguments(0)
 tableName = WScript.Arguments(1)
@@ -342,7 +342,7 @@ Call oBag.AddValue("Value",value)
 Call oAPI.Return(oBag)
 							</ScriptBody>
             <TimeoutSeconds>60</TimeoutSeconds>
-            <ObjectName>$Target/Property[Type="PostgreMP.Windows.Table"]/TableName$</ObjectName>
+            <ObjectName>$Target/Property[Type="PostgresMP.Windows.Table"]/TableName$</ObjectName>
             <CounterName>Counter</CounterName>
             <InstanceName>Instance</InstanceName>
             <Value>$Data/Property[@Name='Value']$</Value>
@@ -353,14 +353,14 @@ Call oAPI.Return(oBag)
           <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
         </WriteActions>
       </Rule>
-      <Rule ID="PostgreMP.Windows.TableUpdatesRule" Enabled="false" Target="PostgreMP.Windows.Table" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+      <Rule ID="PostgresMP.Windows.TableUpdatesRule" Enabled="false" Target="PostgresMP.Windows.Table" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
         <Category>PerformanceCollection</Category>
         <DataSources>
           <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.PerformanceProvider">
             <IntervalSeconds>7200</IntervalSeconds>
             <SyncTime />
             <ScriptName>TablesUpdatesRule.vbs</ScriptName>
-            <Arguments>$Target/Property[Type="PostgreMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgreMP.Windows.Table"]/TableName$</Arguments>
+            <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$</Arguments>
             <ScriptBody>Dim dbName,tableName
 dbName = WScript.Arguments(0)
 tableName = WScript.Arguments(1)
@@ -387,7 +387,7 @@ Call oAPI.Return(oBag)
 							
 </ScriptBody>
             <TimeoutSeconds>60</TimeoutSeconds>
-            <ObjectName>$Target/Property[Type="PostgreMP.Windows.Table"]/TableName$</ObjectName>
+            <ObjectName>$Target/Property[Type="PostgresMP.Windows.Table"]/TableName$</ObjectName>
             <CounterName>Counter</CounterName>
             <InstanceName>Instance</InstanceName>
             <Value>$Data/Property[@Name='Value']$</Value>
@@ -398,14 +398,14 @@ Call oAPI.Return(oBag)
           <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
         </WriteActions>
       </Rule>
-      <Rule ID="PostgreMP.Windows.TableDeletesRule" Enabled="false" Target="PostgreMP.Windows.Table" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+      <Rule ID="PostgresMP.Windows.TableDeletesRule" Enabled="false" Target="PostgresMP.Windows.Table" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
         <Category>PerformanceCollection</Category>
         <DataSources>
           <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.PerformanceProvider">
             <IntervalSeconds>7200</IntervalSeconds>
             <SyncTime />
             <ScriptName>TablesDeletesRule.vbs</ScriptName>
-            <Arguments>$Target/Property[Type="PostgreMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgreMP.Windows.Table"]/TableName$</Arguments>
+            <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$</Arguments>
             <ScriptBody>Dim dbName,tableName
 dbName = WScript.Arguments(0)
 tableName = WScript.Arguments(1)
@@ -432,7 +432,7 @@ Call oAPI.Return(oBag)
 							
 </ScriptBody>
             <TimeoutSeconds>60</TimeoutSeconds>
-            <ObjectName>$Target/Property[Type="PostgreMP.Windows.Table"]/TableName$</ObjectName>
+            <ObjectName>$Target/Property[Type="PostgresMP.Windows.Table"]/TableName$</ObjectName>
             <CounterName>Counter</CounterName>
             <InstanceName>Instance</InstanceName>
             <Value>$Data/Property[@Name='Value']$</Value>
@@ -445,7 +445,7 @@ Call oAPI.Return(oBag)
       </Rule>
     </Rules>
     <Monitors>
-      <UnitMonitor ID="PostgreMP.Windows.TransactionsMonitor" Accessibility="Public" Enabled="true" Target="PostgreMP.Windows.Database" ParentMonitorID="SystemHealth!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.ThreeStateMonitorType" ConfirmDelivery="false">
+      <UnitMonitor ID="PostgreMP.Windows.TransactionsMonitor" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.DataBase" ParentMonitorID="SystemHealth!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.ThreeStateMonitorType" ConfirmDelivery="false">
         <Category>Custom</Category>
         <AlertSettings AlertMessage="PostgreMP.Windows.TransactionsMonitor_AlertMessageResourceID">
           <AlertOnState>Warning</AlertOnState>
@@ -465,7 +465,7 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>300</IntervalSeconds>
           <SyncTime />
           <ScriptName>PtransactionsPercent.vbs</ScriptName>
-          <Arguments>$Target/Property[Type="PostgreMP.Windows.Database"]/Dbname$</Arguments>
+          <Arguments>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$</Arguments>
           <ScriptBody>Dim dbName
 dbName = WScript.Arguments(0)
 
@@ -542,7 +542,7 @@ Call oAPI.Return(oBag)
           </SuccessExpression>
         </Configuration>
       </UnitMonitor>
-      <UnitMonitor ID="PostgreMP.Windows.VacuumMonitor" Accessibility="Public" Enabled="true" Target="PostgreMP.Windows.Application" ParentMonitorID="SystemHealth!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.TwoStateMonitorType" ConfirmDelivery="false">
+      <UnitMonitor ID="PostgreMP.Windows.VacuumMonitor" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.Application" ParentMonitorID="SystemHealth!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.TwoStateMonitorType" ConfirmDelivery="false">
         <Category>Custom</Category>
         <AlertSettings AlertMessage="PostgreMP.Windows.VacuumMonitor_AlertMessageResourceID">
           <AlertOnState>Error</AlertOnState>
@@ -604,7 +604,7 @@ Call oAPI.Return(oBag)
           </SuccessExpression>
         </Configuration>
       </UnitMonitor>
-      <UnitMonitor ID="PostgreMP.Windows.CacheHitMonitor" Accessibility="Public" Enabled="true" Target="PostgreMP.Windows.Database" ParentMonitorID="SystemHealth!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.ThreeStateMonitorType" ConfirmDelivery="false">
+      <UnitMonitor ID="PostgreMP.Windows.CacheHitMonitor" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.DataBase" ParentMonitorID="SystemHealth!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.ThreeStateMonitorType" ConfirmDelivery="false">
         <Category>Custom</Category>
         <AlertSettings AlertMessage="PostgreMP.Windows.CacheHitMonitor_AlertMessageResourceID">
           <AlertOnState>Warning</AlertOnState>
@@ -612,8 +612,8 @@ Call oAPI.Return(oBag)
           <AlertPriority>Normal</AlertPriority>
           <AlertSeverity>Error</AlertSeverity>
           <AlertParameters>
-            <AlertParameter1>$Target/Property[Type="PostgreMP.Windows.Database"]/Dbname$</AlertParameter1>
-            <AlertParameter2>$Target/Property[Type="PostgreMP.Windows.Database"]/hostName$</AlertParameter2>
+            <AlertParameter1>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$</AlertParameter1>
+            <AlertParameter2>$Target/Property[Type="PostgresMP.Windows.DataBase"]/hostName$</AlertParameter2>
             <AlertParameter3>$Data/Context/Property[@Name='Message']$</AlertParameter3>
           </AlertParameters>
         </AlertSettings>
@@ -626,7 +626,7 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>300</IntervalSeconds>
           <SyncTime />
           <ScriptName>cachehit.vbs</ScriptName>
-          <Arguments>$Target/Property[Type="PostgreMP.Windows.Database"]/Dbname$</Arguments>
+          <Arguments>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$</Arguments>
           <ScriptBody>Dim dbName
 dbName = WScript.Arguments(0)
 
@@ -699,7 +699,7 @@ Call oAPI.Return(oBag)
           </SuccessExpression>
         </Configuration>
       </UnitMonitor>
-      <UnitMonitor ID="PostgreMP.Windows.TableIndexMonitor" Accessibility="Public" Enabled="false" Target="PostgreMP.Windows.Table" ParentMonitorID="SystemHealth!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.TwoStateMonitorType" ConfirmDelivery="false">
+      <UnitMonitor ID="PostgresMP.Windows.TableIndexMonitor" Accessibility="Public" Enabled="false" Target="PostgresMP.Windows.Table" ParentMonitorID="SystemHealth!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.TwoStateMonitorType" ConfirmDelivery="false">
         <Category>Custom</Category>
         <OperationalStates>
           <OperationalState ID="UIGeneratedOpStateId5fd30d383cda4411bc246079ee3de226" MonitorTypeStateID="Success" HealthState="Success" />
@@ -709,7 +709,7 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>18000</IntervalSeconds>
           <SyncTime />
           <ScriptName>TableIndexHit.vbs</ScriptName>
-          <Arguments>$Target/Property[Type="PostgreMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgreMP.Windows.Table"]/TableName$</Arguments>
+          <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$</Arguments>
           <ScriptBody>Option Explicit
 
 Dim dbName,tableName
@@ -769,7 +769,7 @@ Call oAPI.Return(oBag)</ScriptBody>
           </SuccessExpression>
         </Configuration>
       </UnitMonitor>
-      <UnitMonitor ID="PostgreMP.Windows.ConAvaliableMonitor" Accessibility="Public" Enabled="true" Target="PostgreMP.Windows.Application" ParentMonitorID="SystemHealth!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.TwoStateMonitorType" ConfirmDelivery="false">
+      <UnitMonitor ID="PostgreMP.Windows.ConAvaliableMonitor" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.Application" ParentMonitorID="SystemHealth!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.TwoStateMonitorType" ConfirmDelivery="false">
         <Category>Custom</Category>
         <AlertSettings AlertMessage="PostgreMP.Windows.ConAvaliableMonitor_AlertMessageResourceID">
           <AlertOnState>Error</AlertOnState>
@@ -841,7 +841,7 @@ Call oAPI.Return(oBag)
           </SuccessExpression>
         </Configuration>
       </UnitMonitor>
-      <UnitMonitor ID="PostgreMP.Windows.DBConnectionsMonitor" Accessibility="Public" Enabled="true" Target="PostgreMP.Windows.Database" ParentMonitorID="SystemHealth!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.ThreeStateMonitorType" ConfirmDelivery="false">
+      <UnitMonitor ID="PostgreMP.Windows.DBConnectionsMonitor" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.DataBase" ParentMonitorID="SystemHealth!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.ThreeStateMonitorType" ConfirmDelivery="false">
         <Category>Custom</Category>
         <AlertSettings AlertMessage="PostgreMP.Windows.DBConnectionsMonitor_AlertMessageResourceID">
           <AlertOnState>Warning</AlertOnState>
@@ -941,7 +941,7 @@ Call oAPI.Return(oBag)
   </Monitoring>
   <Presentation>
     <Views>
-      <View ID="View_d0f8602482e547cfaeffcdabecb8244e" Accessibility="Public" Enabled="true" Target="PostgreMP.Windows.Database" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+      <View ID="View_d0f8602482e547cfaeffcdabecb8244e" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.DataBase" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria>
           <InMaintenanceMode>false</InMaintenanceMode>
@@ -949,7 +949,7 @@ Call oAPI.Return(oBag)
         <Presentation>
           <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
             <Name>State</Name>
-            <Id>PostgreMP.Windows.Database-*-acc2faa9-eb6c-4b8d-5038-4d5e843b3f5a-*-Health</Id>
+            <Id>PostgresMP.Windows.DataBase-*-acc2faa9-eb6c-4b8d-5038-4d5e843b3f5a-*-Health</Id>
           </ColumnInfo>
           <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
             <Name>In Maintenance Mode</Name>
@@ -1041,12 +1041,12 @@ Call oAPI.Return(oBag)
           </ColumnInfo>
           <ColumnInfo Index="23" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
             <Name>Dbname</Name>
-            <Id>PostgreMP.Windows.Database/Dbname</Id>
+            <Id>PostgresMP.Windows.DataBase/Dbname</Id>
           </ColumnInfo>
         </Presentation>
         <Target />
       </View>
-      <View ID="View_7316caac01d94258853709ec43381cd2" Accessibility="Public" Enabled="true" Target="PostgreMP.Windows.Application" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+      <View ID="View_7316caac01d94258853709ec43381cd2" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.Application" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria>
           <InMaintenanceMode>false</InMaintenanceMode>
@@ -1054,7 +1054,7 @@ Call oAPI.Return(oBag)
         <Presentation>
           <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
             <Name>State</Name>
-            <Id>PostgreMP.Windows.Application-*-bfded8f9-49bb-b448-9516-f7c659097443-*-Health</Id>
+            <Id>PostgresMP.Windows.Application-*-bfded8f9-49bb-b448-9516-f7c659097443-*-Health</Id>
           </ColumnInfo>
           <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
             <Name>Maintenance Mode</Name>
@@ -1074,16 +1074,16 @@ Call oAPI.Return(oBag)
           </ColumnInfo>
           <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
             <Name>Info</Name>
-            <Id>PostgreMP.Windows.Application/Info</Id>
+            <Id>PostgresMP.Windows.Application/Info</Id>
           </ColumnInfo>
           <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
             <Name>Postgres dataBase</Name>
-            <Id>PostgreMP.Windows.Database</Id>
+            <Id>PostgresMP.Windows.DataBase</Id>
           </ColumnInfo>
         </Presentation>
         <Target />
       </View>
-      <View ID="View_7c4202f6b4154825b6050f9574edbd7c" Accessibility="Public" Enabled="true" Target="PostgreMP.Windows.Table" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+      <View ID="View_7c4202f6b4154825b6050f9574edbd7c" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.Table" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria>
           <InMaintenanceMode>false</InMaintenanceMode>
@@ -1091,7 +1091,7 @@ Call oAPI.Return(oBag)
         <Presentation>
           <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
             <Name>State</Name>
-            <Id>PostgreMP.Windows.Table-*-d66af399-08ef-6ea3-1a5f-b23ac8c9f0c9-*-Health</Id>
+            <Id>PostgresMP.Windows.Table-*-d66af399-08ef-6ea3-1a5f-b23ac8c9f0c9-*-Health</Id>
           </ColumnInfo>
           <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
             <Name>In Maintenance Mode</Name>
@@ -1111,11 +1111,11 @@ Call oAPI.Return(oBag)
           </ColumnInfo>
           <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
             <Name>Dbname</Name>
-            <Id>PostgreMP.Windows.Table/Dbname</Id>
+            <Id>PostgresMP.Windows.Table/Dbname</Id>
           </ColumnInfo>
           <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
             <Name>TableName</Name>
-            <Id>PostgreMP.Windows.Table/TableName</Id>
+            <Id>PostgresMP.Windows.Table/TableName</Id>
           </ColumnInfo>
         </Presentation>
         <Target />
@@ -1356,7 +1356,7 @@ Call oAPI.Return(oBag)
         </Presentation>
         <Target />
       </View>
-      <View ID="View_e57d3e1f9366480eb4a25b339111a2a4" Accessibility="Public" Enabled="true" Target="PostgreMP.Windows.Database" TypeID="SC!Microsoft.SystemCenter.AlertViewType" Visible="true">
+      <View ID="View_e57d3e1f9366480eb4a25b339111a2a4" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.DataBase" TypeID="SC!Microsoft.SystemCenter.AlertViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria />
         <Presentation>
@@ -1519,7 +1519,7 @@ Call oAPI.Return(oBag)
         </Presentation>
         <Target />
       </View>
-      <View ID="View_5368fc064c014c72b74c96a6f42ff301" Accessibility="Public" Enabled="true" Target="PostgreMP.Windows.Table" TypeID="SC!Microsoft.SystemCenter.AlertViewType" Visible="true">
+      <View ID="View_5368fc064c014c72b74c96a6f42ff301" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.Table" TypeID="SC!Microsoft.SystemCenter.AlertViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria />
         <Presentation>
@@ -1682,7 +1682,7 @@ Call oAPI.Return(oBag)
         </Presentation>
         <Target />
       </View>
-      <View ID="View_b730d16c551c4da0a2139d97a714456f" Accessibility="Public" Enabled="true" Target="PostgreMP.Windows.Application" TypeID="SC!Microsoft.SystemCenter.AlertViewType" Visible="true">
+      <View ID="View_b730d16c551c4da0a2139d97a714456f" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.Application" TypeID="SC!Microsoft.SystemCenter.AlertViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria />
         <Presentation>
@@ -1880,34 +1880,34 @@ Call oAPI.Return(oBag)
           <Name>PostgreSQLMP</Name>
           <Description>Пакет управления СУБД PostgreSQL</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Application">
+        <DisplayString ElementID="PostgresMP.Windows.Application">
           <Name>Postgres Application</Name>
           <Description>приложение PostgreSQL</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Application" SubElementID="Info">
+        <DisplayString ElementID="PostgresMP.Windows.Application" SubElementID="Info">
           <Name>Инфо</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Database">
+        <DisplayString ElementID="PostgresMP.Windows.DataBase">
           <Name>Postgres dataBase</Name>
           <Description>База данных PostgreSQL</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Database" SubElementID="Dbname">
+        <DisplayString ElementID="PostgresMP.Windows.DataBase" SubElementID="Dbname">
           <Name>Название БД</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Database" SubElementID="hostName">
+        <DisplayString ElementID="PostgresMP.Windows.DataBase" SubElementID="hostName">
           <Name>Имя хоста</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Table">
+        <DisplayString ElementID="PostgresMP.Windows.Table">
           <Name>Postgres Table</Name>
           <Description>Таблицы СУБД PostgreSQL</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Table" SubElementID="Dbname">
+        <DisplayString ElementID="PostgresMP.Windows.Table" SubElementID="Dbname">
           <Name>название БД</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Table" SubElementID="TableName">
+        <DisplayString ElementID="PostgresMP.Windows.Table" SubElementID="TableName">
           <Name>Имя таблицы</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.DatabaseDiscovery">
+        <DisplayString ElementID="PostgresMP.Windows.DataBaseDiscovery">
           <Name>PostgreSQLMP dbDiscovery</Name>
           <Description>dbDiscovery Description</Description>
         </DisplayString>
@@ -1928,34 +1928,34 @@ Call oAPI.Return(oBag)
           <Name>PostgreSQLMP</Name>
           <Description>ManagementPack for PostgreSQL</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Application">
+        <DisplayString ElementID="PostgresMP.Windows.Application">
           <Name>Postgres Application</Name>
           <Description>Application PostgreSQL</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Application" SubElementID="Info">
+        <DisplayString ElementID="PostgresMP.Windows.Application" SubElementID="Info">
           <Name>Info</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Database">
+        <DisplayString ElementID="PostgresMP.Windows.DataBase">
           <Name>Postgres dataBase</Name>
           <Description>DataBase PostgreSQL</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Database" SubElementID="Dbname">
+        <DisplayString ElementID="PostgresMP.Windows.DataBase" SubElementID="Dbname">
           <Name>Name</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Database" SubElementID="hostName">
+        <DisplayString ElementID="PostgresMP.Windows.DataBase" SubElementID="hostName">
           <Name>Host name</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Table">
+        <DisplayString ElementID="PostgresMP.Windows.Table">
           <Name>Postgres Table</Name>
           <Description>Tables of PostgreSQL</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Table" SubElementID="Dbname">
+        <DisplayString ElementID="PostgresMP.Windows.Table" SubElementID="Dbname">
           <Name>DataBase Name</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.Table" SubElementID="TableName">
+        <DisplayString ElementID="PostgresMP.Windows.Table" SubElementID="TableName">
           <Name>Name</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.DatabaseDiscovery">
+        <DisplayString ElementID="PostgresMP.Windows.DataBaseDiscovery">
           <Name>PostgreSQLMP dbDiscovery</Name>
           <Description>dbDiscovery Description</Description>
         </DisplayString>
@@ -2027,13 +2027,13 @@ State:{1}</Description>
         <DisplayString ElementID="View_7c4202f6b4154825b6050f9574edbd7c">
           <Name>Tables</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableIndexMonitor">
+        <DisplayString ElementID="PostgresMP.Windows.TableIndexMonitor">
           <Name>IndexHit</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableIndexMonitor" SubElementID="UIGeneratedOpStateId9ba75359a41940089a81d4ceffc961ed">
+        <DisplayString ElementID="PostgresMP.Windows.TableIndexMonitor" SubElementID="UIGeneratedOpStateId9ba75359a41940089a81d4ceffc961ed">
           <Name>Unhealthy</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableIndexMonitor" SubElementID="UIGeneratedOpStateId5fd30d383cda4411bc246079ee3de226">
+        <DisplayString ElementID="PostgresMP.Windows.TableIndexMonitor" SubElementID="UIGeneratedOpStateId5fd30d383cda4411bc246079ee3de226">
           <Name>Healthy</Name>
         </DisplayString>
         <DisplayString ElementID="Folder_00e626e8ef4c4543a1423b676c7996a4">
@@ -2074,24 +2074,24 @@ State:{1}</Description>
           <Description>Postgres dataBase connections is in warning state
 Percent of connections = {0}</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableInsersRule">
+        <DisplayString ElementID="PostgresMP.Windows.TableInsersRule">
           <Name>Postgres Table Inserts</Name>
           <Description>desc</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableUpdatesRule">
+        <DisplayString ElementID="PostgresMP.Windows.TableUpdatesRule">
           <Name>Postgres Table Updates</Name>
           <Description>desc</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableInsersRule" SubElementID="DS">
+        <DisplayString ElementID="PostgresMP.Windows.TableInsersRule" SubElementID="DS">
           <Name>Script Performance Data Provider</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableInsersRule" SubElementID="WriteToDW">
+        <DisplayString ElementID="PostgresMP.Windows.TableInsersRule" SubElementID="WriteToDW">
           <Name>Performance data publisher</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableInsersRule" SubElementID="WriteToDB">
+        <DisplayString ElementID="PostgresMP.Windows.TableInsersRule" SubElementID="WriteToDB">
           <Name>Performance Data Collection Write Action</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableDeletesRule">
+        <DisplayString ElementID="PostgresMP.Windows.TableDeletesRule">
           <Name>Postgres Table Deletes</Name>
           <Description>desc</Description>
         </DisplayString>
@@ -2107,22 +2107,22 @@ Percent of connections = {0}</Description>
         <DisplayString ElementID="View_85bff1eeeb3c40c99b88955568805ba5">
           <Name>Deletes</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableUpdatesRule" SubElementID="DS">
+        <DisplayString ElementID="PostgresMP.Windows.TableUpdatesRule" SubElementID="DS">
           <Name>Script Performance Data Provider</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableUpdatesRule" SubElementID="WriteToDW">
+        <DisplayString ElementID="PostgresMP.Windows.TableUpdatesRule" SubElementID="WriteToDW">
           <Name>Performance data publisher</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableUpdatesRule" SubElementID="WriteToDB">
+        <DisplayString ElementID="PostgresMP.Windows.TableUpdatesRule" SubElementID="WriteToDB">
           <Name>Performance Data Collection Write Action</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableDeletesRule" SubElementID="WriteToDW">
+        <DisplayString ElementID="PostgresMP.Windows.TableDeletesRule" SubElementID="WriteToDW">
           <Name>Performance data publisher</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableDeletesRule" SubElementID="DS">
+        <DisplayString ElementID="PostgresMP.Windows.TableDeletesRule" SubElementID="DS">
           <Name>Script Performance Data Provider</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgreMP.Windows.TableDeletesRule" SubElementID="WriteToDB">
+        <DisplayString ElementID="PostgresMP.Windows.TableDeletesRule" SubElementID="WriteToDB">
           <Name>Performance Data Collection Write Action</Name>
         </DisplayString>
         <DisplayString ElementID="Folder_f857300309db48708525085ad7ffed76">
@@ -2142,12 +2142,8 @@ Percent of connections = {0}</Description>
           <Name>Postgres</Name>
         </DisplayString>
         <DisplayString ElementID="UINameSpacee3eb748b35e04c07b0bd45ae339962f7.Group">
-          <Name>PostgreMP.Windows.ApplicationGroup</Name>
+          <Name>PostgresMP.Windows.ApplicationGroup</Name>
           <Description>comment</Description>
-        </DisplayString>
-        <DisplayString ElementID="UINameSpacee3eb748b35e04c07b0bd45ae339962f7.Group.DiscoveryRule">
-          <Name>Populate PostgreMP.Windows.ApplicationGroup</Name>
-          <Description>This discovery rule populates the group 'PostgreMP.Windows.ApplicationGroup'</Description>
         </DisplayString>
         </DisplayStrings>
     </LanguagePack>
