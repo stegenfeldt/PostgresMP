@@ -992,6 +992,24 @@
 		<DisplayString ElementID="PostgresMP.Unix.TableDeletesRule" SubElementID="WriteToDB">
 			<Name>Performance Data Collection Write Action</Name>
 		</DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.Application" SubElementID="Info">
+          <Name>Info</Name>
+        </DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.Application" SubElementID="Info">
+          <Name>Info</Name>
+        </DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.DataBase" SubElementID="Dbname">
+          <Name>Data base name</Name>
+        </DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.DataBase" SubElementID="hostName">
+          <Name>Host name</Name>
+        </DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.Table" SubElementID="TableName">
+          <Name>Table Name</Name>
+        </DisplayString>
+		<DisplayString ElementID="PostgresMP.Unix.Table" SubElementID="DBName">
+          <Name>Data base name</Name>
+        </DisplayString>
       </DisplayStrings>
     </LanguagePack>
   </LanguagePacks>

@@ -63,6 +63,7 @@
       <ClassTypes>
         <ClassType ID="PostgresMP.Windows.Application" Comment="Application comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.LocalApplication" Hosted="true" Singleton="false" Extension="false">
           <Property ID="Info" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="Driver" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
         <ClassType ID="PostgresMP.Windows.DataBase" Comment="database comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
           <Property ID="Dbname" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
@@ -97,14 +98,15 @@
           <IntervalSeconds>14400</IntervalSeconds>
           <SyncTime />
           <ScriptName>PostgresComputerDiscovery.vbs</ScriptName>
-          <Arguments>$MPElement$ $Target/Id$ $Target/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Arguments>
+          <Arguments>$MPElement$ $Target/Id$ $Target/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ "Provider=MSDASQL.1;Data Source=PostgreSQL30;"</Arguments>
           <ScriptBody>
 			Option Explicit
-			
+			Dim DriverInfo
 			Dim SourceId, ManagedEntityId, sComputerName
 			SourceId = WScript.Arguments(0) 
 			ManagedEntityId = WScript.Arguments(1)
 			sComputerName = WScript.Arguments(2)
+			DriverInfo = WScript.Arguments(3)
 			
 			Dim oAPI
 			Set oAPI = CreateObject("MOM.ScriptAPI")
@@ -124,7 +126,7 @@
 				Err.Clear
 				Dim conn
 				Set conn= CreateObject("ADODB.Connection")
-				conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
+				conn.Open DriverInfo
 				Dim version
 
 				Dim rs
@@ -142,6 +144,7 @@
 				Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='PostgresMP.Windows.Application']$")
 				Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
 				Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.Application']/Info$", version)
+				Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.Application']/Driver$", DriverInfo)
 				Call oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", "PostgreSQL")
 				Call oDiscoveryData.AddInstance(oInstance)
 				conn.Close
@@ -160,7 +163,7 @@
           <IntervalSeconds>14400</IntervalSeconds>
           <SyncTime />
           <ScriptName>PostgresdbDiscovery.vbs</ScriptName>
-          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Arguments>
+          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ $Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
           <ScriptBody>
 			Option Explicit
 			
@@ -168,6 +171,8 @@
 			SourceId = WScript.Arguments(0) 
 			ManagedEntityId = WScript.Arguments(1)
 			sComputerName = WScript.Arguments(2)
+			Dim DriverInfo
+			DriverInfo = WScript.Arguments(3)
 			
 			Dim oAPI
 			Set oAPI = CreateObject("MOM.ScriptAPI")
@@ -179,7 +184,7 @@
 			
 			Dim conn
 			Set conn= CreateObject("ADODB.Connection")
-			conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
+			conn.Open DriverInfo
 			Dim version
 
 			Dim rs
@@ -215,7 +220,7 @@
           <IntervalSeconds>144000</IntervalSeconds>
           <SyncTime />
           <ScriptName>PostgresdbDiscovery.vbs</ScriptName>
-          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ $Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$</Arguments>
+          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ $Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$ $Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
           <ScriptBody>
 			Option Explicit
 			
@@ -224,6 +229,8 @@
 			ManagedEntityId = WScript.Arguments(1)
 			sComputerName = WScript.Arguments(2)
 			DbName = WScript.Arguments(3)
+			Dim DriverInfo
+			DriverInfo = WScript.Arguments(4)
 			
 			Dim oAPI
 			Set oAPI = CreateObject("MOM.ScriptAPI")
@@ -235,7 +242,7 @@
 			
 			Dim conn
 			Set conn= CreateObject("ADODB.Connection")
-			conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;Database="&amp;DbName
+			conn.Open DriverInfo&amp;"Database="&amp;DbName
 			Dim version
 
 			Dim rs
@@ -272,15 +279,17 @@
             <IntervalSeconds>600</IntervalSeconds>
             <SyncTime />
             <ScriptName>CurrentDatabaseConnections.vbs</ScriptName>
-            <Arguments>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$</Arguments>
+            <Arguments>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$ $Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
             <ScriptBody>Option Explicit
-
+			Dim DriverInfo
+DriverInfo = WScript.Arguments(1)
 Dim conn
 Set conn= CreateObject("ADODB.Connection")
-conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30"
+conn.Open DriverInfo
 
 Dim dbName 
 dbName = WScript.Arguments(0)
+
 Dim rs
 Set rs = CreateObject("ADODB.recordset")
 
@@ -316,14 +325,16 @@ Call oAPI.Return(oBag)
             <IntervalSeconds>7200</IntervalSeconds>
             <SyncTime />
             <ScriptName>TableInserts.vbs</ScriptName>
-            <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$</Arguments>
+            <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$ $Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
             <ScriptBody>Dim dbName,tableName
 dbName = WScript.Arguments(0)
 tableName = WScript.Arguments(1)
+Dim DriverInfo
+DriverInfo = WScript.Arguments(2)
 
 Dim conn
 Set conn= CreateObject("ADODB.Connection")
-conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;Database="&amp;dbName
+conn.Open DriverInfo&amp;"Database="&amp;dbName
 
 Dim rs
 Set rs = CreateObject("ADODB.recordset")
@@ -360,14 +371,16 @@ Call oAPI.Return(oBag)
             <IntervalSeconds>7200</IntervalSeconds>
             <SyncTime />
             <ScriptName>TablesUpdatesRule.vbs</ScriptName>
-            <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$</Arguments>
+            <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$ $Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
             <ScriptBody>Dim dbName,tableName
 dbName = WScript.Arguments(0)
 tableName = WScript.Arguments(1)
+Dim DriverInfo
+DriverInfo = WScript.Arguments(2)
 
 Dim conn
 Set conn= CreateObject("ADODB.Connection")
-conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;Database="&amp;dbName
+conn.Open DriverInfo&amp;"Database="&amp;dbName
 
 Dim rs
 Set rs = CreateObject("ADODB.recordset")
@@ -405,14 +418,16 @@ Call oAPI.Return(oBag)
             <IntervalSeconds>7200</IntervalSeconds>
             <SyncTime />
             <ScriptName>TablesDeletesRule.vbs</ScriptName>
-            <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$</Arguments>
+            <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$ $Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
             <ScriptBody>Dim dbName,tableName
 dbName = WScript.Arguments(0)
 tableName = WScript.Arguments(1)
+Dim DriverInfo
+DriverInfo = WScript.Arguments(2)
 
 Dim conn
 Set conn= CreateObject("ADODB.Connection")
-conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;Database="&amp;dbName
+conn.Open DriverInfo&amp;"Database="&amp;dbName
 
 Dim rs
 Set rs = CreateObject("ADODB.recordset")
@@ -465,13 +480,15 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>300</IntervalSeconds>
           <SyncTime />
           <ScriptName>PtransactionsPercent.vbs</ScriptName>
-          <Arguments>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$</Arguments>
+          <Arguments>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$ $Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
           <ScriptBody>Dim dbName
 dbName = WScript.Arguments(0)
+Dim DriverInfo
+DriverInfo = WScript.Arguments(1)
 
 Dim conn
 Set conn= CreateObject("ADODB.Connection")
-conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
+conn.Open DriverInfo
 
 Dim rs
 Set rs = CreateObject("ADODB.recordset")
@@ -558,10 +575,12 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>120</IntervalSeconds>
           <SyncTime />
           <ScriptName>AutovacuumConfig.vbs</ScriptName>
-          <Arguments />
+          <Arguments>$Target/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
           <ScriptBody>Dim conn
+		  Dim DriverInfo
+DriverInfo = WScript.Arguments(0)
 Set conn= CreateObject("ADODB.Connection")
-conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
+conn.Open DriverInfo
 
 Dim rs
 Set rs = CreateObject("ADODB.recordset")
@@ -626,13 +645,15 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>300</IntervalSeconds>
           <SyncTime />
           <ScriptName>cachehit.vbs</ScriptName>
-          <Arguments>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$</Arguments>
+          <Arguments>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$ $Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
           <ScriptBody>Dim dbName
 dbName = WScript.Arguments(0)
+Dim DriverInfo
+DriverInfo = WScript.Arguments(1)
 
 Dim conn
 Set conn= CreateObject("ADODB.Connection")
-conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;"
+conn.Open DriverInfo
 
 Dim rs
 Set rs = CreateObject("ADODB.recordset")
@@ -709,16 +730,18 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>18000</IntervalSeconds>
           <SyncTime />
           <ScriptName>TableIndexHit.vbs</ScriptName>
-          <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$</Arguments>
+          <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$ $Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
           <ScriptBody>Option Explicit
 
 Dim dbName,tableName
 dbName = WScript.Arguments(0)
 tableName = WScript.Arguments(1)
+Dim DriverInfo
+DriverInfo = WScript.Arguments(2)
 
 Dim conn
 Set conn= CreateObject("ADODB.Connection")
-conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30;Database="&amp;dbName
+conn.Open DriverInfo&amp;"Database="&amp;dbName
 
 Dim rs
 Set rs = CreateObject("ADODB.recordset")
@@ -788,13 +811,14 @@ Call oAPI.Return(oBag)</ScriptBody>
           <IntervalSeconds>600</IntervalSeconds>
           <SyncTime />
           <ScriptName>Avaliability.vbs</ScriptName>
-          <Arguments />
+          <Arguments>$Target/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
           <ScriptBody>Option Explicit
 On Error Resume Next
-
+Dim DriverInfo
+DriverInfo = WScript.Arguments(0)
 Dim conn
 Set conn= CreateObject("ADODB.Connection")
-conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30"
+conn.Open DriverInfo
 
 Dim rs
 Set rs = CreateObject("ADODB.recordset")
@@ -861,12 +885,13 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>600</IntervalSeconds>
           <SyncTime />
           <ScriptName>dataBaseConnectionsMon.vbs</ScriptName>
-          <Arguments />
+          <Arguments>$Target/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
           <ScriptBody>Option Explicit
-
+		  Dim DriverInfo
+DriverInfo = WScript.Arguments(0)
 Dim conn
 Set conn= CreateObject("ADODB.Connection")
-conn.Open "Provider=MSDASQL.1;Data Source=PostgreSQL30"
+conn.Open DriverInfo
 
 Dim dbName 
 dbName = WScript.Arguments(0)
