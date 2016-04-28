@@ -163,7 +163,7 @@
           <IntervalSeconds>14400</IntervalSeconds>
           <SyncTime />
           <ScriptName>PostgresdbDiscovery.vbs</ScriptName>
-          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ $Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ $Target/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
           <ScriptBody>
 			Option Explicit
 			
@@ -220,7 +220,7 @@
           <IntervalSeconds>144000</IntervalSeconds>
           <SyncTime />
           <ScriptName>PostgresdbDiscovery.vbs</ScriptName>
-          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ $Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$ $Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ $Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$ $Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
           <ScriptBody>
 			Option Explicit
 			
@@ -885,7 +885,7 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>600</IntervalSeconds>
           <SyncTime />
           <ScriptName>dataBaseConnectionsMon.vbs</ScriptName>
-          <Arguments>$Target/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+          <Arguments>$Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
           <ScriptBody>Option Explicit
 		  Dim DriverInfo
 DriverInfo = WScript.Arguments(0)
