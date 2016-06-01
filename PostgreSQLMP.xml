@@ -16,6 +16,11 @@
         <Version>7.1.10226.0</Version>
         <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
       </Reference>
+      <Reference Alias="UnixAuth">
+        <ID>Unix.Authoring.Library</ID>
+        <Version>7.3.1.2</Version>
+        <PublicKeyToken>a0ae1bc76c673799</PublicKeyToken>
+      </Reference>
       <Reference Alias="Windows">
         <ID>Microsoft.Windows.Library</ID>
         <Version>7.5.8501.0</Version>
@@ -51,6 +56,11 @@
         <Version>7.0.8433.0</Version>
         <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
       </Reference>
+      <Reference Alias="Unix">
+        <ID>Microsoft.Unix.Library</ID>
+        <Version>7.5.1050.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
       <Reference Alias="SystemHealth">
         <ID>System.Health.Library</ID>
         <Version>7.0.8433.0</Version>
@@ -61,31 +71,120 @@
   <TypeDefinitions>
     <EntityTypes>
       <ClassTypes>
-        <ClassType ID="PostgresMP.Windows.Application" Comment="Application comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.LocalApplication" Hosted="true" Singleton="false" Extension="false">
+        <ClassType ID="PostgresMP.Windows.Application" Comment="Windows Postgres Application" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.LocalApplication" Hosted="true" Singleton="false" Extension="false">
           <Property ID="Info" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
           <Property ID="Driver" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
-        <ClassType ID="PostgresMP.Windows.DataBase" Comment="database comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
-          <Property ID="Dbname" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        <ClassType ID="PostgresMP.Windows.DataBase" Comment="Windows Postgres Database" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="DBName" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
           <Property ID="hostName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
-        <ClassType ID="PostgresMP.Windows.Table" Comment="table comment" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
-          <Property ID="Dbname" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        <ClassType ID="PostgresMP.Windows.Table" Comment="Windows Postgres Table" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="DBName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
           <Property ID="TableName" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
         </ClassType>
-        <ClassType ID="UINameSpacee3eb748b35e04c07b0bd45ae339962f7.Group" Accessibility="Public" Abstract="false" Base="MicrosoftSystemCenterInstanceGroupLibrary7585010!Microsoft.SystemCenter.InstanceGroup" Hosted="false" Singleton="true" Extension="false" />
+        <ClassType ID="PostgresMP.Unix.Application" Comment="Unix Postgres Application" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.LocalApplication" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="Info" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="psqlPath" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+        <ClassType ID="PostgresMP.Unix.DataBase" Comment="Unix Postgres Database" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="DBName" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="hostName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+        <ClassType ID="PostgresMP.Unix.Table" Comment="Unix Postgres Table" Accessibility="Public" Abstract="false" Base="Unix!Microsoft.Unix.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="TableName" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="DBName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+        <ClassType ID="UINameSpace8700a93c803749d0a03633fcb74f3922.Group" Accessibility="Public" Abstract="false" Base="MicrosoftSystemCenterInstanceGroupLibrary7585010!Microsoft.SystemCenter.InstanceGroup" Hosted="false" Singleton="true" Extension="false" />
       </ClassTypes>
       <RelationshipTypes>
-        <RelationshipType ID="ApplHostsApplicationComponent" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+        <RelationshipType ID="PostgresMP.Windows.AppHasDB" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
           <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Windows.Application" />
           <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Windows.DataBase" />
         </RelationshipType>
-        <RelationshipType ID="DataBaseHostsTable" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+        <RelationshipType ID="PostgresMP.Windows.DBhasTable" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
           <Source ID="Database" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Windows.DataBase" />
           <Target ID="Table" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Windows.Table" />
         </RelationshipType>
+        <RelationshipType ID="PostgresMP.Unix.AppHasDB" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Unix.Application" />
+          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Unix.DataBase" />
+        </RelationshipType>
+        <RelationshipType ID="PostgresMP.Unix.DBhasTable" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+          <Source ID="Application" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Unix.DataBase" />
+          <Target ID="ApplicationComponent" MinCardinality="0" MaxCardinality="2147483647" Type="PostgresMP.Unix.Table" />
+        </RelationshipType>
       </RelationshipTypes>
     </EntityTypes>
+    <ModuleTypes>
+      <DataSourceModuleType ID="PostgresMP.Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource" Accessibility="Public" Batching="false">
+        <Configuration>
+          <IncludeSchemaTypes>
+            <SchemaType>System!System.Discovery.MapperSchema</SchemaType>
+            <SchemaType>System!System.ExpressionEvaluatorSchema</SchemaType>
+          </IncludeSchemaTypes>
+          <xsd:element name="Interval" type="xsd:integer" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="TargetSystem" type="xsd:string" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="ShellScript" type="xsd:string" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="ScriptArguments" type="xsd:string" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="Timeout" type="xsd:integer" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="UserName" type="xsd:string" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="Password" type="xsd:string" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="PSScriptName" type="xsd:string" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="PSScriptBody" type="xsd:string" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="FilterExpression" type="ExpressionType" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="ClassId" type="xsd:string" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="InstanceSettings" type="SettingsType" minOccurs="1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="Interval" Selector="$Config/Interval$" ParameterType="int" />
+          <OverrideableParameter ID="Timeout" Selector="$Config/Timeout$" ParameterType="int" />
+          <OverrideableParameter ID="ScriptArguments" Selector="$Config/ScriptArguments$" ParameterType="string" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Scheduler" TypeID="System!System.Discovery.Scheduler">
+                <Scheduler>
+                  <SimpleReccuringSchedule>
+                    <Interval>$Config/Interval$</Interval>
+                    <SyncTime />
+                  </SimpleReccuringSchedule>
+                  <ExcludeDates />
+                </Scheduler>
+              </DataSource>
+              <ProbeAction ID="InvokeProbe" TypeID="UnixAuth!Unix.Authoring.ShellScript.PropertyBag.ProbeAction">
+                <TargetSystem>$Config/TargetSystem$</TargetSystem>
+                <ShellScript>$Config/ShellScript$</ShellScript>
+                <ScriptArguments>$Config/ScriptArguments$</ScriptArguments>
+                <Timeout>$Config/Timeout$</Timeout>
+                <UserName>$Config/UserName$</UserName>
+                <Password>$Config/Password$</Password>
+                <PSScriptName>$Config/PSScriptName$</PSScriptName>
+                <PSScriptBody>$Config/PSScriptBody$</PSScriptBody>
+              </ProbeAction>
+              <ConditionDetection ID="Filter" TypeID="System!System.ExpressionFilter">
+                <Expression>$Config/FilterExpression$</Expression>
+              </ConditionDetection>
+              <ConditionDetection ID="Mapper" TypeID="System!System.Discovery.ClassSnapshotDataMapper">
+                <ClassId>$Config/ClassId$</ClassId>
+                <InstanceSettings>$Config/InstanceSettings$</InstanceSettings>
+              </ConditionDetection>
+            </MemberModules>
+            <Composition>
+              <Node ID="Mapper">
+                <Node ID="Filter">
+                  <Node ID="InvokeProbe">
+                    <Node ID="Scheduler" />
+                  </Node>
+                </Node>
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.Discovery.Data</OutputType>
+      </DataSourceModuleType>
+    </ModuleTypes>
   </TypeDefinitions>
   <Monitoring>
     <Discoveries>
@@ -163,7 +262,7 @@
           <IntervalSeconds>14400</IntervalSeconds>
           <SyncTime />
           <ScriptName>PostgresdbDiscovery.vbs</ScriptName>
-          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ $Target/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ "$Target/Property[Type="PostgresMP.Windows.Application"]/Driver$"</Arguments>
           <ScriptBody>
 			Option Explicit
 			
@@ -197,7 +296,7 @@
 			  Dim oInstance
 			  Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='PostgresMP.Windows.DataBase']$")
 			  Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
-			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.DataBase']/Dbname$", version) 
+			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.DataBase']/DBName$", version) 
 			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.DataBase']/hostName$", sComputerName) 
 			  Call oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", version) 
 			  Call oDiscoveryData.AddInstance(oInstance)
@@ -220,7 +319,7 @@
           <IntervalSeconds>144000</IntervalSeconds>
           <SyncTime />
           <ScriptName>PostgresdbDiscovery.vbs</ScriptName>
-          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ $Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$ $Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+          <Arguments>$MPElement$ $Target/Id$ $Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$ "$Target/Property[Type="PostgresMP.Windows.DataBase"]/DBName$" "$Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$"</Arguments>
           <ScriptBody>
 			Option Explicit
 			
@@ -248,15 +347,15 @@
 			Dim rs
 			Set rs = CreateObject("ADODB.recordset")
 			'---&gt;db version
-			rs.Open "SELECT table_name,Current_Database() FROM information_schema.tables Where table_schema='public'", conn
+			rs.Open "SELECT table_name,Current_Database() FROM Information_schema.tables Where table_schema='public'", conn
 				 
 			do until rs.EOF
 			  version = rs.Fields(0).value
 			  Dim oInstance
 			  Set oInstance = oDiscoveryData.CreateClassInstance("$MPElement[Name='PostgresMP.Windows.Table']$")
 			  Call oInstance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", sComputerName)
-			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.DataBase']/Dbname$", DbName) 
-			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.Table']/Dbname$", DbName) 
+			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.DataBase']/DBName$", DbName) 
+			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.Table']/DBName$", DbName) 
 			  Call oInstance.AddProperty("$MPElement[Name='PostgresMP.Windows.Table']/TableName$", version) 
 			  Call oInstance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", version) 
 			  Call oDiscoveryData.AddInstance(oInstance)
@@ -270,16 +369,222 @@
           <TimeoutSeconds>300</TimeoutSeconds>
         </DataSource>
       </Discovery>
+      <Discovery ID="PostgresMP.Unix.ApplicationDiscovery" Enabled="true" Target="Unix!Microsoft.Unix.Computer" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="PostgresMP.Unix.Application" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="PostgresMP.Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
+          <Interval>180</Interval>
+          <TargetSystem>$Target/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</TargetSystem>
+          <ShellScript>
+				#!/bin/sh				
+				if pgrep postgres &gt; /dev/null
+				then
+					DATABASE=postgres
+					USERNAME=postgres
+					echo "$1;""$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -c "select version()")"
+				else
+					exit 1
+				fi
+		  </ShellScript>
+          <ScriptArguments>"/opt/PostgreSQL/*/bin"</ScriptArguments>
+          <Timeout>30</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <PSScriptName>ApplicationDiscovery.ps1</PSScriptName>
+          <PSScriptBody>
+				param([string]$StdOut,[string]$StdErr,[string]$ReturnCode)
+				$StdOut = $StdOut -replace '\r?\n',''
+				if ($ReturnCode -eq "0" -And $StdErr.Length -eq 0){
+					$splited = $StdOut.Replace(" ","_").Split(";")
+					$version = $splited[1]
+					$path = $splited[0]
+					$api = New-Object -comObject 'MOM.ScriptAPI'
+					$bag = $api.CreatePropertyBag()
+					$bag.AddValue("Info","$version")
+					$bag.AddValue("psqlPath","$path")
+					$bag
+				} elseif ($ReturnCode -eq "0" -And $StdErr.Length -ge 0) {
+					$api = New-Object -comObject 'MOM.ScriptAPI'
+					$bag = $api.CreatePropertyBag()
+					$bag.AddValue("Info","$StdErr")
+					$bag.AddValue("psqlPath","path to psql may be wrong")
+					$bag
+				}
+		  </PSScriptBody>
+          <FilterExpression />
+          <ClassId>$MPElement[Name="PostgresMP.Unix.Application"]$</ClassId>
+          <InstanceSettings>
+            <Settings>
+              <Setting>
+                <Name>$MPElement[Name='Unix!Microsoft.Unix.Computer']/PrincipalName$</Name>
+                <Value>$Target/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.Application']/Info$</Name>
+                <Value>$Data/Property[@Name='Info']$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.Application']/psqlPath$</Name>
+                <Value>$Data/Property[@Name='psqlPath']$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='System!System.Entity']/DisplayName$</Name>
+                <Value>PostgreSQL</Value>
+              </Setting>
+            </Settings>
+          </InstanceSettings>
+        </DataSource>
+      </Discovery>
+      <Discovery ID="PostgresMP.Unix.DataBaseDiscovery" Enabled="true" Target="PostgresMP.Unix.Application" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="PostgresMP.Unix.DataBase" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
+          <Interval>180</Interval>
+          <TargetSystem>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</TargetSystem>
+          <ShellScript>
+				#!/bin/sh	
+				DATABASE=postgres
+				USERNAME=postgres
+				$1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A --record-separator=";" -c "SELECT pg_database.datname from pg_database where datistemplate='f'"
+		  </ShellScript>
+          <ScriptArguments>"$Target/Property[Type="PostgresMP.Unix.Application"]/psqlPath$"</ScriptArguments>
+          <Timeout>30</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <PSScriptName>DataBaseDiscovery.ps1</PSScriptName>
+          <PSScriptBody>
+				param([string]$StdOut,[string]$StdErr,[string]$ReturnCode)
+				$StdOut = $StdOut -replace '\r?\n',''
+				if ($ReturnCode -eq "0"){
+					$api = New-Object -comObject 'MOM.ScriptAPI'
+					$StdOut.Split(";") | ForEach {
+						$nospace = $_.Replace(" ","_")
+						$bag = $api.CreatePropertyBag()
+						$bag.AddValue("NoSpaseName","$nospace")
+						$bag.AddValue("DBName","$_")
+						$bag
+					}
+				}
+		  </PSScriptBody>
+          <FilterExpression />
+          <ClassId>$MPElement[Name="PostgresMP.Unix.DataBase"]$</ClassId>
+          <InstanceSettings>
+            <Settings>
+              <Setting>
+                <Name>$MPElement[Name='Unix!Microsoft.Unix.Computer']/PrincipalName$</Name>
+                <Value>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.DataBase']/DBName$</Name>
+                <Value>$Data/Property[@Name='DBName']$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.DataBase']/hostName$</Name>
+                <Value>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='System!System.Entity']/DisplayName$</Name>
+                <Value>$Data/Property[@Name='NoSpaseName']$</Value>
+              </Setting>
+            </Settings>
+          </InstanceSettings>
+        </DataSource>
+      </Discovery>
+      <Discovery ID="PostgresMP.Unix.TableDiscovery" Enabled="true" Target="PostgresMP.Unix.DataBase" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="PostgresMP.Unix.Table" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.PropertyBag.Discovery.DataSource">
+          <Interval>1800</Interval>
+          <TargetSystem>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</TargetSystem>
+          <ShellScript>
+				#!/bin/sh	
+				DATABASE=$2
+				USERNAME=postgres
+				$1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A --record-separator=";" -c "SELECT table_name FROM Information_schema.tables Where table_schema='public'"
+		  </ShellScript>
+          <ScriptArguments>"$Target/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$" "$Target/Property[Type="PostgresMP.Unix.DataBase"]/DBName$"</ScriptArguments>
+          <Timeout>30</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <PSScriptName>TableDiscovery.ps1</PSScriptName>
+          <PSScriptBody>
+				param([string]$StdOut,[string]$StdErr,[string]$ReturnCode)
+				$StdOut = $StdOut -replace '\r?\n',''
+				if (($ReturnCode -eq "0") -and ($StdOut -ne "")){
+					$api = New-Object -comObject 'MOM.ScriptAPI'
+					$StdOut.Split(";") | ForEach {
+						$nospace = $_.Replace(" ","_")
+						$bag = $api.CreatePropertyBag()
+						$bag.AddValue("NoSpaseName","$nospace")
+						$bag.AddValue("TableName","$_")
+						$bag
+					}
+				}
+		  </PSScriptBody>
+          <FilterExpression />
+          <ClassId>$MPElement[Name="PostgresMP.Unix.Table"]$</ClassId>
+          <InstanceSettings>
+            <Settings>
+              <Setting>
+                <Name>$MPElement[Name='Unix!Microsoft.Unix.Computer']/PrincipalName$</Name>
+                <Value>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.Table']/TableName$</Name>
+                <Value>$Data/Property[@Name='TableName']$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.Table']/DBName$</Name>
+                <Value>$Target/Property[Type="PostgresMP.Unix.DataBase"]/DBName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='PostgresMP.Unix.DataBase']/DBName$</Name>
+                <Value>$Target/Property[Type="PostgresMP.Unix.DataBase"]/DBName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name='System!System.Entity']/DisplayName$</Name>
+                <Value>$Data/Property[@Name='NoSpaseName']$</Value>
+              </Setting>
+            </Settings>
+          </InstanceSettings>
+        </DataSource>
+      </Discovery>
+      <Discovery ID="UINameSpace8700a93c803749d0a03633fcb74f3922.Group.DiscoveryRule" Enabled="true" Target="UINameSpace8700a93c803749d0a03633fcb74f3922.Group" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryRelationship TypeID="MicrosoftSystemCenterInstanceGroupLibrary7585010!Microsoft.SystemCenter.InstanceGroupContainsEntities" />
+        </DiscoveryTypes>
+        <DataSource ID="GroupPopulationDataSource" TypeID="SC!Microsoft.SystemCenter.GroupPopulator">
+          <RuleId>$MPElement$</RuleId>
+          <GroupInstanceId>$MPElement[Name="UINameSpace8700a93c803749d0a03633fcb74f3922.Group"]$</GroupInstanceId>
+          <MembershipRules>
+            <MembershipRule>
+              <MonitoringClass>$MPElement[Name="PostgresMP.Windows.Application"]$</MonitoringClass>
+              <RelationshipClass>$MPElement[Name="MicrosoftSystemCenterInstanceGroupLibrary7585010!Microsoft.SystemCenter.InstanceGroupContainsEntities"]$</RelationshipClass>
+            </MembershipRule>
+            <MembershipRule>
+              <MonitoringClass>$MPElement[Name="PostgresMP.Unix.Application"]$</MonitoringClass>
+              <RelationshipClass>$MPElement[Name="MicrosoftSystemCenterInstanceGroupLibrary7585010!Microsoft.SystemCenter.InstanceGroupContainsEntities"]$</RelationshipClass>
+            </MembershipRule>
+          </MembershipRules>
+        </DataSource>
+      </Discovery>
     </Discoveries>
     <Rules>
-	  <Rule ID="PostgresMP.Windows.DBConnectionsRule" Enabled="true" Target="PostgresMP.Windows.DataBase" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+      <Rule ID="PostgresMP.Windows.DBConnectionsRule" Enabled="true" Target="PostgresMP.Windows.DataBase" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
         <Category>PerformanceCollection</Category>
         <DataSources>
           <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedScript.PerformanceProvider">
             <IntervalSeconds>600</IntervalSeconds>
             <SyncTime />
             <ScriptName>CurrentDatabaseConnections.vbs</ScriptName>
-            <Arguments>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$ $Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+            <Arguments>"$Target/Property[Type="PostgresMP.Windows.DataBase"]/DBName$" "$Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$"</Arguments>
             <ScriptBody>Option Explicit
 			Dim DriverInfo
 DriverInfo = WScript.Arguments(1)
@@ -307,7 +612,7 @@ Call oBag.AddValue("value",value)
 Call oAPI.Return(oBag)
 							</ScriptBody>
             <TimeoutSeconds>60</TimeoutSeconds>
-            <ObjectName>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$</ObjectName>
+            <ObjectName>$Target/Property[Type="PostgresMP.Windows.DataBase"]/DBName$</ObjectName>
             <CounterName>Counter</CounterName>
             <InstanceName>Instance</InstanceName>
             <Value>$Data/Property[@Name='value']$</Value>
@@ -317,7 +622,7 @@ Call oAPI.Return(oBag)
           <WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
           <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
         </WriteActions>
-      </Rule>	
+      </Rule>
       <Rule ID="PostgresMP.Windows.TableInsersRule" Enabled="false" Target="PostgresMP.Windows.Table" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
         <Category>PerformanceCollection</Category>
         <DataSources>
@@ -325,7 +630,7 @@ Call oAPI.Return(oBag)
             <IntervalSeconds>7200</IntervalSeconds>
             <SyncTime />
             <ScriptName>TableInserts.vbs</ScriptName>
-            <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$ $Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+            <Arguments>"$Target/Property[Type="PostgresMP.Windows.Table"]/DBName$" "$Target/Property[Type="PostgresMP.Windows.Table"]/TableName$" "$Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$"</Arguments>
             <ScriptBody>Dim dbName,tableName
 dbName = WScript.Arguments(0)
 tableName = WScript.Arguments(1)
@@ -371,7 +676,7 @@ Call oAPI.Return(oBag)
             <IntervalSeconds>7200</IntervalSeconds>
             <SyncTime />
             <ScriptName>TablesUpdatesRule.vbs</ScriptName>
-            <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$ $Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+            <Arguments>"$Target/Property[Type="PostgresMP.Windows.Table"]/DBName$" "$Target/Property[Type="PostgresMP.Windows.Table"]/TableName$" "$Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$"</Arguments>
             <ScriptBody>Dim dbName,tableName
 dbName = WScript.Arguments(0)
 tableName = WScript.Arguments(1)
@@ -418,7 +723,7 @@ Call oAPI.Return(oBag)
             <IntervalSeconds>7200</IntervalSeconds>
             <SyncTime />
             <ScriptName>TablesDeletesRule.vbs</ScriptName>
-            <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$ $Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+            <Arguments>"$Target/Property[Type="PostgresMP.Windows.Table"]/DBName$" "$Target/Property[Type="PostgresMP.Windows.Table"]/TableName$" "$Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$"</Arguments>
             <ScriptBody>Dim dbName,tableName
 dbName = WScript.Arguments(0)
 tableName = WScript.Arguments(1)
@@ -458,6 +763,138 @@ Call oAPI.Return(oBag)
           <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
         </WriteActions>
       </Rule>
+      <Rule ID="PostgresMP.Unix.DataBaseConnectionsRule" Enabled="false" Target="PostgresMP.Unix.DataBase" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.DataSource">
+            <Interval>1800</Interval>
+            <TargetSystem>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</TargetSystem>
+            <ShellScript>
+				##
+				#!/bin/sh	
+				DATABASE=postgres
+				USERNAME=postgres
+				OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT COUNT(datid) FROM pg_database d LEFT JOIN pg_stat_activity s ON (s.datid = d.oid) WHERE d.datname = '$2'")
+				echo "$OUT"
+			    ##
+			  </ShellScript>
+            <ScriptArguments>"$Target/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$" "$Target/Property[Type="PostgresMP.Unix.DataBase"]/DBName$"</ScriptArguments>
+            <Timeout>60</Timeout>
+            <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+            <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+            <FilterExpression />
+          </DataSource>
+        </DataSources>
+        <ConditionDetection ID="Mapper" TypeID="SystemPerf!System.Performance.DataGenericMapper">
+          <ObjectName>Postgres.DataBase</ObjectName>
+          <CounterName>Counter</CounterName>
+          <InstanceName>$Target/Property[Type="PostgresMP.Unix.DataBase"]/DBName$</InstanceName>
+          <Value>$Data///*[local-name()='StdOut']$</Value>
+        </ConditionDetection>
+        <WriteActions>
+          <WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
+      <Rule ID="PostgresMP.Unix.TableInsersRule" Enabled="false" Target="PostgresMP.Unix.Table" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.DataSource">
+            <Interval>1800</Interval>
+            <TargetSystem>$Target/Host/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</TargetSystem>
+            <ShellScript>
+				##
+				#!/bin/sh	
+				DATABASE=$2
+				USERNAME=postgres
+				OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT n_tup_ins from pg_stat_user_tables Where relname='$3'")
+				echo "$OUT"
+			    ##
+			  </ShellScript>
+            <ScriptArguments>"$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$" "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/DBName$" "$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$"</ScriptArguments>
+            <Timeout>60</Timeout>
+            <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+            <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+            <FilterExpression />
+          </DataSource>
+        </DataSources>
+        <ConditionDetection ID="Mapper" TypeID="SystemPerf!System.Performance.DataGenericMapper">
+          <ObjectName>Postgres.Unix.Table</ObjectName>
+          <CounterName>Counter</CounterName>
+          <InstanceName>$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$</InstanceName>
+          <Value>$Data///*[local-name()='StdOut']$</Value>
+        </ConditionDetection>
+        <WriteActions>
+          <WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
+      <Rule ID="PostgresMP.Unix.TableUpdatesRule" Enabled="false" Target="PostgresMP.Unix.Table" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.DataSource">
+            <Interval>1800</Interval>
+            <TargetSystem>$Target/Host/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</TargetSystem>
+            <ShellScript>
+				##
+				#!/bin/sh	
+				DATABASE=$2
+				USERNAME=postgres
+				OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT n_tup_upd from pg_stat_user_tables Where relname='$3'")
+				echo "$OUT"
+			    ##
+			  </ShellScript>
+            <ScriptArguments>"$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$" "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/DBName$" "$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$"</ScriptArguments>
+            <Timeout>60</Timeout>
+            <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+            <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+            <FilterExpression />
+          </DataSource>
+        </DataSources>
+        <ConditionDetection ID="Mapper" TypeID="SystemPerf!System.Performance.DataGenericMapper">
+          <ObjectName>Postgres.Unix.Table</ObjectName>
+          <CounterName>Counter</CounterName>
+          <InstanceName>$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$</InstanceName>
+          <Value>$Data///*[local-name()='StdOut']$</Value>
+        </ConditionDetection>
+        <WriteActions>
+          <WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
+      <Rule ID="PostgresMP.Unix.TableDeletesRule" Enabled="false" Target="PostgresMP.Unix.Table" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="DS" TypeID="UnixAuth!Unix.Authoring.TimedShellScript.DataSource">
+            <Interval>1800</Interval>
+            <TargetSystem>$Target/Host/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</TargetSystem>
+            <ShellScript>
+				##
+				#!/bin/sh	
+				DATABASE=$2
+				USERNAME=postgres
+				OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT n_tup_del from pg_stat_user_tables Where relname='$3'")
+				echo "$OUT"
+			    ##
+			  </ShellScript>
+            <ScriptArguments>"$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$" "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/DBName$" "$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$"</ScriptArguments>
+            <Timeout>60</Timeout>
+            <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+            <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+            <FilterExpression />
+          </DataSource>
+        </DataSources>
+        <ConditionDetection ID="Mapper" TypeID="SystemPerf!System.Performance.DataGenericMapper">
+          <ObjectName>Postgres.Unix.Table</ObjectName>
+          <CounterName>Counter</CounterName>
+          <InstanceName>$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$</InstanceName>
+          <Value>$Data///*[local-name()='StdOut']$</Value>
+        </ConditionDetection>
+        <WriteActions>
+          <WriteAction ID="WriteToDB" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="WriteToDW" TypeID="SCDW!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
     </Rules>
     <Monitors>
       <UnitMonitor ID="PostgreMP.Windows.TransactionsMonitor" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.DataBase" ParentMonitorID="SystemHealth!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.ThreeStateMonitorType" ConfirmDelivery="false">
@@ -468,7 +905,9 @@ Call oAPI.Return(oBag)
           <AlertPriority>Normal</AlertPriority>
           <AlertSeverity>MatchMonitorHealth</AlertSeverity>
           <AlertParameters>
-            <AlertParameter1>$Data/Context/Property[@Name='Message']$</AlertParameter1>
+            <AlertParameter1>$Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</AlertParameter1>
+            <AlertParameter2>$Target/Property[Type="PostgresMP.Windows.DataBase"]/DBName$</AlertParameter2>
+            <AlertParameter3>$Data/Context/Property[@Name='Message']$</AlertParameter3>
           </AlertParameters>
         </AlertSettings>
         <OperationalStates>
@@ -480,7 +919,7 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>300</IntervalSeconds>
           <SyncTime />
           <ScriptName>PtransactionsPercent.vbs</ScriptName>
-          <Arguments>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$ $Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+          <Arguments>"$Target/Property[Type="PostgresMP.Windows.DataBase"]/DBName$" "$Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$"</Arguments>
           <ScriptBody>Dim dbName
 dbName = WScript.Arguments(0)
 Dim DriverInfo
@@ -566,6 +1005,9 @@ Call oAPI.Return(oBag)
           <AutoResolve>true</AutoResolve>
           <AlertPriority>Normal</AlertPriority>
           <AlertSeverity>Error</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</AlertParameter1>
+          </AlertParameters>
         </AlertSettings>
         <OperationalStates>
           <OperationalState ID="UIGeneratedOpStateId8ee2f5725ffe4316b46b6c5591fdd4f4" MonitorTypeStateID="Success" HealthState="Success" />
@@ -575,7 +1017,7 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>120</IntervalSeconds>
           <SyncTime />
           <ScriptName>AutovacuumConfig.vbs</ScriptName>
-          <Arguments>$Target/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+          <Arguments>"$Target/Property[Type="PostgresMP.Windows.Application"]/Driver$"</Arguments>
           <ScriptBody>Dim conn
 		  Dim DriverInfo
 DriverInfo = WScript.Arguments(0)
@@ -631,7 +1073,7 @@ Call oAPI.Return(oBag)
           <AlertPriority>Normal</AlertPriority>
           <AlertSeverity>Error</AlertSeverity>
           <AlertParameters>
-            <AlertParameter1>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$</AlertParameter1>
+            <AlertParameter1>$Target/Property[Type="PostgresMP.Windows.DataBase"]/DBName$</AlertParameter1>
             <AlertParameter2>$Target/Property[Type="PostgresMP.Windows.DataBase"]/hostName$</AlertParameter2>
             <AlertParameter3>$Data/Context/Property[@Name='Message']$</AlertParameter3>
           </AlertParameters>
@@ -645,7 +1087,7 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>300</IntervalSeconds>
           <SyncTime />
           <ScriptName>cachehit.vbs</ScriptName>
-          <Arguments>$Target/Property[Type="PostgresMP.Windows.DataBase"]/Dbname$ $Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+          <Arguments>"$Target/Property[Type="PostgresMP.Windows.DataBase"]/DBName$" "$Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$"</Arguments>
           <ScriptBody>Dim dbName
 dbName = WScript.Arguments(0)
 Dim DriverInfo
@@ -722,6 +1164,18 @@ Call oAPI.Return(oBag)
       </UnitMonitor>
       <UnitMonitor ID="PostgresMP.Windows.TableIndexMonitor" Accessibility="Public" Enabled="false" Target="PostgresMP.Windows.Table" ParentMonitorID="SystemHealth!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="Windows!Microsoft.Windows.TimedScript.TwoStateMonitorType" ConfirmDelivery="false">
         <Category>Custom</Category>
+        <AlertSettings AlertMessage="PostgresMP.Windows.TableIndexMonitor_AlertMessageResourceID">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>Error</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</AlertParameter1>
+            <AlertParameter2>$Target/Host/Property[Type="PostgresMP.Windows.DataBase"]/DBName$</AlertParameter2>
+            <AlertParameter3>$Target/Property[Type="PostgresMP.Windows.Table"]/TableName$</AlertParameter3>
+            <AlertParameter4>$Data/Context/Property[@Name='Message']$</AlertParameter4>
+          </AlertParameters>
+        </AlertSettings>
         <OperationalStates>
           <OperationalState ID="UIGeneratedOpStateId5fd30d383cda4411bc246079ee3de226" MonitorTypeStateID="Success" HealthState="Success" />
           <OperationalState ID="UIGeneratedOpStateId9ba75359a41940089a81d4ceffc961ed" MonitorTypeStateID="Error" HealthState="Warning" />
@@ -730,7 +1184,7 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>18000</IntervalSeconds>
           <SyncTime />
           <ScriptName>TableIndexHit.vbs</ScriptName>
-          <Arguments>$Target/Property[Type="PostgresMP.Windows.Table"]/Dbname$ $Target/Property[Type="PostgresMP.Windows.Table"]/TableName$ $Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+          <Arguments>"$Target/Property[Type="PostgresMP.Windows.Table"]/DBName$" "$Target/Property[Type="PostgresMP.Windows.Table"]/TableName$" "$Target/Host/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$"</Arguments>
           <ScriptBody>Option Explicit
 
 Dim dbName,tableName
@@ -811,7 +1265,7 @@ Call oAPI.Return(oBag)</ScriptBody>
           <IntervalSeconds>600</IntervalSeconds>
           <SyncTime />
           <ScriptName>Avaliability.vbs</ScriptName>
-          <Arguments>$Target/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+          <Arguments>"$Target/Property[Type="PostgresMP.Windows.Application"]/Driver$"</Arguments>
           <ScriptBody>Option Explicit
 On Error Resume Next
 Dim DriverInfo
@@ -873,7 +1327,9 @@ Call oAPI.Return(oBag)
           <AlertPriority>Normal</AlertPriority>
           <AlertSeverity>Error</AlertSeverity>
           <AlertParameters>
-            <AlertParameter1>$Data/Context/Property[@Name='Message']$</AlertParameter1>
+            <AlertParameter1>$Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</AlertParameter1>
+            <AlertParameter2>$Target/Property[Type="PostgresMP.Windows.DataBase"]/DBName$</AlertParameter2>
+            <AlertParameter3>$Data/Context/Property[@Name='Message']$</AlertParameter3>
           </AlertParameters>
         </AlertSettings>
         <OperationalStates>
@@ -885,7 +1341,7 @@ Call oAPI.Return(oBag)
           <IntervalSeconds>600</IntervalSeconds>
           <SyncTime />
           <ScriptName>dataBaseConnectionsMon.vbs</ScriptName>
-          <Arguments>$Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$</Arguments>
+          <Arguments>"$Target/Host/Property[Type="PostgresMP.Windows.Application"]/Driver$"</Arguments>
           <ScriptBody>Option Explicit
 		  Dim DriverInfo
 DriverInfo = WScript.Arguments(0)
@@ -962,11 +1418,269 @@ Call oAPI.Return(oBag)
           </SuccessExpression>
         </Configuration>
       </UnitMonitor>
+      <UnitMonitor ID="PostgresMP.Unix.ConnectionAvaliableMonitor" Accessibility="Internal" Enabled="true" Target="PostgresMP.Unix.Application" ParentMonitorID="SystemHealth!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="UnixAuth!Unix.Authoring.ShellScript.MatchesRegExp.ThreeState.MonitorType" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="PostgresMP.Unix.ConnectionAvaliableMonitor.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</AlertParameter1>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="StatusOK" MonitorTypeStateID="StatusOK" HealthState="Success" />
+          <OperationalState ID="StatusWarning" MonitorTypeStateID="StatusWarning" HealthState="Warning" />
+          <OperationalState ID="StatusError" MonitorTypeStateID="StatusError" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <Interval>1800</Interval>
+          <TargetSystem>
+					$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$
+		  </TargetSystem>
+          <ShellScript>
+					#!/bin/sh	
+					DATABASE=postgres
+					USERNAME=postgres
+					OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT version()")
+					if [ -n "$OUT" ]; then
+						echo "OK"
+					else
+						echo "ERROR"
+					fi
+				</ShellScript>
+          <ScriptArguments>"$Target/Property[Type="PostgresMP.Unix.Application"]/psqlPath$"</ScriptArguments>
+          <Timeout>60</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <ErrorRegExp>^ERROR</ErrorRegExp>
+          <WarningRegExp>^Warning</WarningRegExp>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="PostgresMP.Unix.TransactionPercent" Accessibility="Internal" Enabled="true" Target="PostgresMP.Unix.DataBase" ParentMonitorID="SystemHealth!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="UnixAuth!Unix.Authoring.ShellScript.MatchesRegExp.ThreeState.MonitorType" ConfirmDelivery="false">
+        <Category>PerformanceHealth</Category>
+        <AlertSettings AlertMessage="PostgresMP.Unix.TransactionPercent.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</AlertParameter1>
+            <AlertParameter2>$Target/Property[Type="PostgresMP.Unix.DataBase"]/DBName$</AlertParameter2>
+            <AlertParameter3>$Data/Context///*[local-name()="StdOut"]$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="StatusOK" MonitorTypeStateID="StatusOK" HealthState="Success" />
+          <OperationalState ID="StatusWarning" MonitorTypeStateID="StatusWarning" HealthState="Warning" />
+          <OperationalState ID="StatusError" MonitorTypeStateID="StatusError" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <Interval>1800</Interval>
+          <TargetSystem>
+					$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$
+		  </TargetSystem>
+          <ShellScript>
+					#!/bin/sh	
+					DATABASE=postgres
+					USERNAME=postgres
+					OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT round(100.*sd.xact_commit/(sd.xact_commit+sd.xact_rollback), 0) AS commitratio FROM pg_stat_database sd JOIN pg_database d ON (d.oid=sd.datid) JOIN pg_user u ON (u.usesysid=d.datdba) WHERE sd.xact_commit+sd.xact_rollback&lt;&gt;0 AND d.datname = '$2'")
+					if [ $OUT -lt 75 ]; then
+						echo "ERROR"$OUT
+					elif [ $OUT -le 90] &amp;&amp; [ $OUT -ge 75]; then
+						echo "WARNING"$OUT
+					else
+						echo "OK"
+					fi
+				</ShellScript>
+          <ScriptArguments>"$Target/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$" "$Target/Property[Type="PostgresMP.Unix.DataBase"]/DBName$"</ScriptArguments>
+          <Timeout>60</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <ErrorRegExp>^ERROR</ErrorRegExp>
+          <WarningRegExp>^WARNING</WarningRegExp>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="PostgresMP.Unix.AutovacuumConfig" Accessibility="Internal" Enabled="true" Target="PostgresMP.Unix.Application" ParentMonitorID="SystemHealth!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="UnixAuth!Unix.Authoring.ShellScript.MatchesRegExp.ThreeState.MonitorType" ConfirmDelivery="false">
+        <Category>ConfigurationHealth</Category>
+        <AlertSettings AlertMessage="PostgresMP.Unix.Autovacuum.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</AlertParameter1>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="StatusOK" MonitorTypeStateID="StatusOK" HealthState="Success" />
+          <OperationalState ID="StatusWarning" MonitorTypeStateID="StatusWarning" HealthState="Warning" />
+          <OperationalState ID="StatusError" MonitorTypeStateID="StatusError" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <Interval>1800</Interval>
+          <TargetSystem>
+					$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$
+		  </TargetSystem>
+          <ShellScript>
+					#!/bin/sh	
+					DATABASE=postgres
+					USERNAME=postgres
+					OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT setting From pg_settings WHere name='autovacuum'")
+					if [ $OUT -ne "on" ]; then
+						echo "ERROR"
+					fi
+				</ShellScript>
+          <ScriptArguments>"$Target/Property[Type="PostgresMP.Unix.Application"]/psqlPath$"</ScriptArguments>
+          <Timeout>60</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <ErrorRegExp>^ERROR</ErrorRegExp>
+          <WarningRegExp>^WARNING</WarningRegExp>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="PostgresMP.Unix.CacheHitPercent" Accessibility="Internal" Enabled="true" Target="PostgresMP.Unix.DataBase" ParentMonitorID="SystemHealth!System.Health.ConfigurationState" Remotable="true" Priority="Normal" TypeID="UnixAuth!Unix.Authoring.ShellScript.MatchesRegExp.ThreeState.MonitorType" ConfirmDelivery="false">
+        <Category>ConfigurationHealth</Category>
+        <AlertSettings AlertMessage="PostgresMP.Unix.CacheHitPercent.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</AlertParameter1>
+            <AlertParameter2>$Target/Property[Type="PostgresMP.Unix.DataBase"]/DBName$</AlertParameter2>
+            <AlertParameter3>$Data/Context///*[local-name()="StdOut"]$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="StatusOK" MonitorTypeStateID="StatusOK" HealthState="Success" />
+          <OperationalState ID="StatusWarning" MonitorTypeStateID="StatusWarning" HealthState="Warning" />
+          <OperationalState ID="StatusError" MonitorTypeStateID="StatusError" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <Interval>1800</Interval>
+          <TargetSystem>
+					$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$
+		  </TargetSystem>
+          <ShellScript>
+					#!/bin/sh	
+					DATABASE=postgres
+					USERNAME=postgres
+					OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT round(100.*sd.blks_hit/(sd.blks_read+sd.blks_hit), 2) AS dhitratio,  d.datname,  u.usename FROM pg_stat_database sd JOIN pg_database d ON (d.oid=sd.datid) JOIN pg_user u ON (u.usesysid=d.datdba) WHERE sd.blks_read+sd.blks_hit&lt;&gt;0 AND d.datname = '$2'")
+					if [ $OUT -lt 30 ]; then
+						echo "ERROR"$OUT
+					elif [ $OUT -le 70] &amp;&amp; [ $OUT -ge 30]; then
+						echo "WARNING"$OUT
+					else
+						echo "OK"
+					fi
+				</ShellScript>
+          <ScriptArguments>"$Target/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$" "$Target/Property[Type="PostgresMP.Unix.DataBase"]/DBName$"</ScriptArguments>
+          <Timeout>60</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <ErrorRegExp>^ERROR</ErrorRegExp>
+          <WarningRegExp>^WARNING</WarningRegExp>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="PostgresMP.Unix.TableIndexHit" Accessibility="Internal" Enabled="false" Target="PostgresMP.Unix.Table" ParentMonitorID="SystemHealth!System.Health.PerformanceState" Remotable="true" Priority="Normal" TypeID="UnixAuth!Unix.Authoring.ShellScript.MatchesRegExp.ThreeState.MonitorType" ConfirmDelivery="false">
+        <Category>PerformanceHealth</Category>
+        <AlertSettings AlertMessage="PostgresMP.Unix.TableIndexHit.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</AlertParameter1>
+            <AlertParameter2>$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/DBName$</AlertParameter2>
+            <AlertParameter3>$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$</AlertParameter3>
+            <AlertParameter4>$Data/Context///*[local-name()="StdOut"]$</AlertParameter4>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="StatusOK" MonitorTypeStateID="StatusOK" HealthState="Success" />
+          <OperationalState ID="StatusWarning" MonitorTypeStateID="StatusWarning" HealthState="Warning" />
+          <OperationalState ID="StatusError" MonitorTypeStateID="StatusError" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <Interval>1800</Interval>
+          <TargetSystem>
+					$Target/Host/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$
+		  </TargetSystem>
+          <ShellScript>
+					#!/bin/sh	
+					DATABASE=$2
+					USERNAME=postgres
+					OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT CASE WHEN idx_scan = 0 THEN 100 ELSE seq_scan::float4 / idx_scan * 100 END AS ratio, relname, seq_scan, idx_scan FROM pg_stat_user_tables WHERE relname='$3'")
+					if [ $OUT -lt 30 ]; then
+						echo "WARNING"$OUT
+					else
+						echo "OK"
+					fi
+				</ShellScript>
+          <ScriptArguments>"$Target/Host/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$" "$Target/Host/Property[Type="PostgresMP.Unix.DataBase"]/DBName$" "$Target/Property[Type="PostgresMP.Unix.Table"]/TableName$"</ScriptArguments>
+          <Timeout>60</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <ErrorRegExp>^ERROR</ErrorRegExp>
+          <WarningRegExp>^WARNING</WarningRegExp>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="PostgresMP.Unix.DataBaseConnections" Accessibility="Internal" Enabled="true" Target="PostgresMP.Unix.DataBase" ParentMonitorID="SystemHealth!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="UnixAuth!Unix.Authoring.ShellScript.MatchesRegExp.ThreeState.MonitorType" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="PostgresMP.Unix.DataBaseConnections.AlertMessage">
+          <AlertOnState>Warning</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$</AlertParameter1>
+            <AlertParameter2>$Target/Property[Type="PostgresMP.Unix.DataBase"]/DBName$</AlertParameter2>
+            <AlertParameter3>$Data/Context///*[local-name()="StdOut"]$</AlertParameter3>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="StatusOK" MonitorTypeStateID="StatusOK" HealthState="Success" />
+          <OperationalState ID="StatusWarning" MonitorTypeStateID="StatusWarning" HealthState="Warning" />
+          <OperationalState ID="StatusError" MonitorTypeStateID="StatusError" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <Interval>1800</Interval>
+          <TargetSystem>
+					$Target/Host/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/NetworkName$
+		  </TargetSystem>
+          <ShellScript>
+					#!/bin/sh	
+					DATABASE=postgres
+					USERNAME=postgres
+					OUT=$($1/psql -U "${USERNAME}" "${DATABASE}" -w -t -A -c "SELECT COUNT(datid) AS current, (SELECT setting AS mc FROM pg_settings WHERE name = 'max_connections') AS mc, d.datname FROM pg_database d LEFT JOIN pg_stat_activity s ON (s.datid = d.oid) WHERE d.datname = '$2' GROUP BY 2,3 ")
+					if [ $OUT -gt 93 ]; then
+						echo "ERROR"$OUT"%"
+					elif [ $OUT -le 93] &amp;&amp; [ $OUT -ge 85]; then
+						echo "WARNING"$OUT"%"
+					else
+						echo "OK"
+					fi
+				</ShellScript>
+          <ScriptArguments>"$Target/Host/Property[Type="PostgresMP.Unix.Application"]/psqlPath$" "$Target/Property[Type="PostgresMP.Unix.DataBase"]/DBName$"</ScriptArguments>
+          <Timeout>60</Timeout>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.ActionAccount"]/Password$</Password>
+          <ErrorRegExp>^ERROR</ErrorRegExp>
+          <WarningRegExp>^WARNING</WarningRegExp>
+        </Configuration>
+      </UnitMonitor>
     </Monitors>
+    <Overrides>
+      <DiscoveryConfigurationOverride ID="OverrideForDiscoveryPostgresMPUnixApplicationDiscoveryForContextMicrosoftUnixComputer02832d7c19414736af20d4b29379d2cb" Context="Unix!Microsoft.Unix.Computer" ContextInstance="e882a80d-087c-cf65-a507-6a89d5d73684" Enforced="false" Discovery="PostgresMP.Unix.ApplicationDiscovery" Parameter="ScriptArguments" Module="DS">
+        <Value>"/usr/bin"</Value>
+      </DiscoveryConfigurationOverride>
+    </Overrides>
   </Monitoring>
   <Presentation>
     <Views>
-      <View ID="View_d0f8602482e547cfaeffcdabecb8244e" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.DataBase" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+      <View ID="View_f4c81b685ebe43cab2cedb6a68312582" Accessibility="Public" Enabled="true" Target="PostgresMP.Unix.Application" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria>
           <InMaintenanceMode>false</InMaintenanceMode>
@@ -974,9 +1688,9 @@ Call oAPI.Return(oBag)
         <Presentation>
           <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
             <Name>State</Name>
-            <Id>PostgresMP.Windows.DataBase-*-acc2faa9-eb6c-4b8d-5038-4d5e843b3f5a-*-Health</Id>
+            <Id>PostgresMP.Unix.Application-*-d9822ae9-6132-b49d-9dc6-32591353a76c-*-Health</Id>
           </ColumnInfo>
-          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
             <Name>In Maintenance Mode</Name>
             <Id>InMaintenanceMode</Id>
           </ColumnInfo>
@@ -993,85 +1707,21 @@ Call oAPI.Return(oBag)
             <Id>System.Entity/DisplayName</Id>
           </ColumnInfo>
           <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Principal Name</Name>
-            <Id>Microsoft.Windows.Computer/PrincipalName</Id>
+            <Name>Info</Name>
+            <Id>PostgresMP.Unix.Application/Info</Id>
           </ColumnInfo>
           <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>DNS Name</Name>
-            <Id>Microsoft.Windows.Computer/DNSName</Id>
+            <Name>psqlPath</Name>
+            <Id>PostgresMP.Unix.Application/psqlPath</Id>
           </ColumnInfo>
           <ColumnInfo Index="7" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>NetBIOS Computer Name</Name>
-            <Id>Microsoft.Windows.Computer/NetbiosComputerName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="8" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>NetBIOS Domain Name</Name>
-            <Id>Microsoft.Windows.Computer/NetbiosDomainName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="9" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>IP Address</Name>
-            <Id>Microsoft.Windows.Computer/IPAddress</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="10" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Network Name</Name>
-            <Id>Microsoft.Windows.Computer/NetworkName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="11" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Active Directory SID</Name>
-            <Id>Microsoft.Windows.Computer/ActiveDirectoryObjectSid</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="12" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="false" Visible="false" SortOrder="Ascending">
-            <Name>Virtual Machine</Name>
-            <Id>Microsoft.Windows.Computer/IsVirtualMachine</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="13" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>DNS Domain Name</Name>
-            <Id>Microsoft.Windows.Computer/DomainDnsName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="14" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Organizational Unit</Name>
-            <Id>Microsoft.Windows.Computer/OrganizationalUnit</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="15" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>DNS Forest Name</Name>
-            <Id>Microsoft.Windows.Computer/ForestDnsName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="16" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Active Directory Site</Name>
-            <Id>Microsoft.Windows.Computer/ActiveDirectorySite</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="17" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Logical Processors</Name>
-            <Id>Microsoft.Windows.Computer/LogicalProcessors</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="18" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Physical Processors</Name>
-            <Id>Microsoft.Windows.Computer/PhysicalProcessors</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="19" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Host Server Name</Name>
-            <Id>Microsoft.Windows.Computer/HostServerName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="20" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Virtual Machine Name</Name>
-            <Id>Microsoft.Windows.Computer/VirtualMachineName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="21" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Offset In Minutes From Greenwich Time</Name>
-            <Id>Microsoft.Windows.Computer/OffsetInMinuteFromGreenwichTime</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="22" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="false" Visible="false" SortOrder="Ascending">
-            <Name>Last Inventory Date</Name>
-            <Id>Microsoft.Windows.Computer/LastInventoryDate</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="23" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Dbname</Name>
-            <Id>PostgresMP.Windows.DataBase/Dbname</Id>
+            <Name>PostgresMP.Unix.DataBase</Name>
+            <Id>PostgresMP.Unix.DataBase</Id>
           </ColumnInfo>
         </Presentation>
         <Target />
       </View>
-      <View ID="View_7316caac01d94258853709ec43381cd2" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.Application" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+      <View ID="View_050702e0ea114b6cae65c1201be8d0f7" Accessibility="Public" Enabled="true" Target="PostgresMP.Unix.DataBase" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria>
           <InMaintenanceMode>false</InMaintenanceMode>
@@ -1079,7 +1729,85 @@ Call oAPI.Return(oBag)
         <Presentation>
           <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
             <Name>State</Name>
-            <Id>PostgresMP.Windows.Application-*-bfded8f9-49bb-b448-9516-f7c659097443-*-Health</Id>
+            <Id>PostgresMP.Unix.DataBase-*-3c8c45ff-317f-c10f-e9cd-c9803ceb3da1-*-Health</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>System.Entity/DisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DBName</Name>
+            <Id>PostgresMP.Unix.DataBase/DBName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>hostName</Name>
+            <Id>PostgresMP.Unix.DataBase/hostName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="7" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>PostgresMP.Unix.Table</Name>
+            <Id>PostgresMP.Unix.Table</Id>
+          </ColumnInfo>
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_ceb77ca680dc4d1093e14c0fb2647976" Accessibility="Public" Enabled="true" Target="PostgresMP.Unix.Table" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <InMaintenanceMode>false</InMaintenanceMode>
+        </Criteria>
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>State</Name>
+            <Id>PostgresMP.Unix.Table-*-61dbebd5-a2a4-9431-923b-3d286dbb77fd-*-Health</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>System.Entity/DisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>TableName</Name>
+            <Id>PostgresMP.Unix.Table/TableName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DBName</Name>
+            <Id>PostgresMP.Unix.Table/DBName</Id>
+          </ColumnInfo>
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_5e3e99cf175e40b091a5b86d2d18ef7c" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.Application" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <InMaintenanceMode>false</InMaintenanceMode>
+        </Criteria>
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>State</Name>
+            <Id>PostgresMP.Windows.Application-*-c5aa3700-d3bd-003e-f565-5e00832851d9-*-Health</Id>
           </ColumnInfo>
           <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
             <Name>Maintenance Mode</Name>
@@ -1102,13 +1830,17 @@ Call oAPI.Return(oBag)
             <Id>PostgresMP.Windows.Application/Info</Id>
           </ColumnInfo>
           <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Driver</Name>
+            <Id>PostgresMP.Windows.Application/Driver</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="7" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
             <Name>Postgres dataBase</Name>
             <Id>PostgresMP.Windows.DataBase</Id>
           </ColumnInfo>
         </Presentation>
         <Target />
       </View>
-      <View ID="View_7c4202f6b4154825b6050f9574edbd7c" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.Table" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+      <View ID="View_5669dacf93904b9db68390c42164362b" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.Table" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria>
           <InMaintenanceMode>false</InMaintenanceMode>
@@ -1116,17 +1848,17 @@ Call oAPI.Return(oBag)
         <Presentation>
           <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
             <Name>State</Name>
-            <Id>PostgresMP.Windows.Table-*-d66af399-08ef-6ea3-1a5f-b23ac8c9f0c9-*-Health</Id>
+            <Id>PostgresMP.Windows.Table-*-572a0f93-107d-f47e-2295-6532d1b42d3b-*-Health</Id>
           </ColumnInfo>
-          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>In Maintenance Mode</Name>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Maintenance Mode</Name>
             <Id>InMaintenanceMode</Id>
           </ColumnInfo>
           <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
             <Name>Name</Name>
             <Id>Name</Id>
           </ColumnInfo>
-          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
             <Name>Path</Name>
             <Id>Path</Id>
           </ColumnInfo>
@@ -1134,254 +1866,59 @@ Call oAPI.Return(oBag)
             <Name>Display Name</Name>
             <Id>System.Entity/DisplayName</Id>
           </ColumnInfo>
-          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Dbname</Name>
-            <Id>PostgresMP.Windows.Table/Dbname</Id>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>DataBase Name</Name>
+            <Id>PostgresMP.Windows.Table/DBName</Id>
           </ColumnInfo>
           <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>TableName</Name>
+            <Name>Name</Name>
             <Id>PostgresMP.Windows.Table/TableName</Id>
           </ColumnInfo>
         </Presentation>
         <Target />
       </View>
-      <View ID="View_f0661fb63db849109f7b78da839d9792" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.PerformanceViewType" Visible="true">
+      <View ID="View_90d66804e6d64705b6310850d02e15f7" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.DataBase" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria>
-          <RuleList>
-            <Rule>91bae06a-2f25-3a15-1574-1090ad11735d</Rule>
-          </RuleList>
+          <InMaintenanceMode>false</InMaintenanceMode>
         </Criteria>
         <Presentation>
-          <SortedColumnIndex>0</SortedColumnIndex>
-          <SortOrder>0</SortOrder>
-          <StartTime>2015-11-15T13:12:24.6082702+03:00</StartTime>
-          <EndTime>2015-11-16T13:12:24.6082702+03:00</EndTime>
-          <DynamicTimeTicks>8640000000000</DynamicTimeTicks>
-          <IsDynamic>true</IsDynamic>
-          <Is3DMode>false</Is3DMode>
-          <ShowAlerts>false</ShowAlerts>
-          <ShowMaintenanceMode>false</ShowMaintenanceMode>
-          <BaselineMode>false</BaselineMode>
-          <ShowPointLabels>false</ShowPointLabels>
-          <EnableSmartLabels>true</EnableSmartLabels>
-          <RightAngleAxes>false</RightAngleAxes>
-          <ClusterSeries>false</ClusterSeries>
-          <Title />
-          <TitleFont>Microsoft Sans Serif,12,Regular</TitleFont>
-          <ChartFont>Microsoft Sans Serif,8.25,Regular</ChartFont>
-          <ShowBands>false</ShowBands>
-          <BandColor>-1579033</BandColor>
-          <ChartType>Spline</ChartType>
-          <Depth>100</Depth>
-          <GapDepth>100</GapDepth>
-          <Perspective>10</Perspective>
-          <GraphXRotation>0</GraphXRotation>
-          <GraphYRotation>0</GraphYRotation>
-          <XLabelAngle>0</XLabelAngle>
-          <LabelColor>-16777216</LabelColor>
-          <LabelFont>Microsoft Sans Serif,8.25,Regular</LabelFont>
-          <XAxisVisible>True</XAxisVisible>
-          <XShowMajorGridlines>false</XShowMajorGridlines>
-          <XShowMinorGridlines>false</XShowMinorGridlines>
-          <ShowInterlaceStrips>false</ShowInterlaceStrips>
-          <XInterlaceColor>16777215</XInterlaceColor>
-          <XShowSideMargin>true</XShowSideMargin>
-          <XAxisFont>Microsoft Sans Serif,8.25,Regular</XAxisFont>
-          <AutoAxis>true</AutoAxis>
-          <AxisMax>100</AxisMax>
-          <AxisMin>0</AxisMin>
-          <YAxisVisible>True</YAxisVisible>
-          <YShowMajorGridlines>true</YShowMajorGridlines>
-          <YShowMinorGridlines>false</YShowMinorGridlines>
-          <YShowInterlaceStrips>false</YShowInterlaceStrips>
-          <YShowSideMargin>true</YShowSideMargin>
-          <YAxisFont>Microsoft Sans Serif,8.25,Regular</YAxisFont>
-          <BackgroundColor1>-1</BackgroundColor1>
-          <BackgroundColor2>-1</BackgroundColor2>
-          <GradientType>None</GradientType>
-          <Series />
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>State</Name>
+            <Id>PostgresMP.Windows.DataBase-*-4e799809-54e8-66c9-340b-8f25e419c803-*-Health</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>System.Entity/DisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>PostgresMP.Windows.DataBase/DBName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Host name</Name>
+            <Id>PostgresMP.Windows.DataBase/hostName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="7" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Postgres Table</Name>
+            <Id>PostgresMP.Windows.Table</Id>
+          </ColumnInfo>
         </Presentation>
         <Target />
       </View>
-      <View ID="View_b23c6e6f42974ee9ba7ef600274761ec" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.PerformanceViewType" Visible="true">
-        <Category>Operations</Category>
-        <Criteria>
-          <RuleList>
-            <Rule>be80b353-3b96-b58a-9cd4-508518e8bfee</Rule>
-          </RuleList>
-        </Criteria>
-        <Presentation>
-          <SortedColumnIndex>0</SortedColumnIndex>
-          <SortOrder>0</SortOrder>
-          <StartTime>2015-11-25T11:39:16.6597856+03:00</StartTime>
-          <EndTime>2015-11-26T11:39:16.6597856+03:00</EndTime>
-          <DynamicTimeTicks>864000000000</DynamicTimeTicks>
-          <IsDynamic>true</IsDynamic>
-          <Is3DMode>false</Is3DMode>
-          <ShowAlerts>false</ShowAlerts>
-          <ShowMaintenanceMode>false</ShowMaintenanceMode>
-          <BaselineMode>false</BaselineMode>
-          <ShowPointLabels>false</ShowPointLabels>
-          <EnableSmartLabels>true</EnableSmartLabels>
-          <RightAngleAxes>false</RightAngleAxes>
-          <ClusterSeries>false</ClusterSeries>
-          <Title />
-          <TitleFont>Microsoft Sans Serif,12,Regular</TitleFont>
-          <ChartFont>Microsoft Sans Serif,8.25,Regular</ChartFont>
-          <ShowBands>false</ShowBands>
-          <BandColor>-1579033</BandColor>
-          <ChartType>Line</ChartType>
-          <Depth>100</Depth>
-          <GapDepth>100</GapDepth>
-          <Perspective>10</Perspective>
-          <GraphXRotation>0</GraphXRotation>
-          <GraphYRotation>0</GraphYRotation>
-          <XLabelAngle>0</XLabelAngle>
-          <LabelColor>-16777216</LabelColor>
-          <LabelFont>Microsoft Sans Serif,8.25,Regular</LabelFont>
-          <XAxisVisible>True</XAxisVisible>
-          <XShowMajorGridlines>false</XShowMajorGridlines>
-          <XShowMinorGridlines>false</XShowMinorGridlines>
-          <ShowInterlaceStrips>false</ShowInterlaceStrips>
-          <XInterlaceColor>16777215</XInterlaceColor>
-          <XShowSideMargin>true</XShowSideMargin>
-          <XAxisFont>Microsoft Sans Serif,8.25,Regular</XAxisFont>
-          <AutoAxis>true</AutoAxis>
-          <AxisMax>100</AxisMax>
-          <AxisMin>0</AxisMin>
-          <YAxisVisible>True</YAxisVisible>
-          <YShowMajorGridlines>true</YShowMajorGridlines>
-          <YShowMinorGridlines>false</YShowMinorGridlines>
-          <YShowInterlaceStrips>false</YShowInterlaceStrips>
-          <YShowSideMargin>true</YShowSideMargin>
-          <YAxisFont>Microsoft Sans Serif,8.25,Regular</YAxisFont>
-          <BackgroundColor1>-1</BackgroundColor1>
-          <BackgroundColor2>-1</BackgroundColor2>
-          <GradientType>None</GradientType>
-          <Series />
-        </Presentation>
-        <Target />
-      </View>
-      <View ID="View_08fe703af5e24aac97c4af4e4f8ac7bf" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.PerformanceViewType" Visible="true">
-        <Category>Operations</Category>
-        <Criteria>
-          <RuleList>
-            <Rule>8c34acb1-a816-0279-0e60-d61ba535a1af</Rule>
-          </RuleList>
-        </Criteria>
-        <Presentation>
-          <SortedColumnIndex>0</SortedColumnIndex>
-          <SortOrder>0</SortOrder>
-          <StartTime>2015-11-25T11:40:15.8735463+03:00</StartTime>
-          <EndTime>2015-11-26T11:40:15.8735463+03:00</EndTime>
-          <DynamicTimeTicks>864000000000</DynamicTimeTicks>
-          <IsDynamic>true</IsDynamic>
-          <Is3DMode>false</Is3DMode>
-          <ShowAlerts>false</ShowAlerts>
-          <ShowMaintenanceMode>false</ShowMaintenanceMode>
-          <BaselineMode>false</BaselineMode>
-          <ShowPointLabels>false</ShowPointLabels>
-          <EnableSmartLabels>true</EnableSmartLabels>
-          <RightAngleAxes>false</RightAngleAxes>
-          <ClusterSeries>false</ClusterSeries>
-          <Title />
-          <TitleFont>Microsoft Sans Serif,12,Regular</TitleFont>
-          <ChartFont>Microsoft Sans Serif,8.25,Regular</ChartFont>
-          <ShowBands>false</ShowBands>
-          <BandColor>-1579033</BandColor>
-          <ChartType>Line</ChartType>
-          <Depth>100</Depth>
-          <GapDepth>100</GapDepth>
-          <Perspective>10</Perspective>
-          <GraphXRotation>0</GraphXRotation>
-          <GraphYRotation>0</GraphYRotation>
-          <XLabelAngle>0</XLabelAngle>
-          <LabelColor>-16777216</LabelColor>
-          <LabelFont>Microsoft Sans Serif,8.25,Regular</LabelFont>
-          <XAxisVisible>True</XAxisVisible>
-          <XShowMajorGridlines>false</XShowMajorGridlines>
-          <XShowMinorGridlines>false</XShowMinorGridlines>
-          <ShowInterlaceStrips>false</ShowInterlaceStrips>
-          <XInterlaceColor>16777215</XInterlaceColor>
-          <XShowSideMargin>true</XShowSideMargin>
-          <XAxisFont>Microsoft Sans Serif,8.25,Regular</XAxisFont>
-          <AutoAxis>true</AutoAxis>
-          <AxisMax>100</AxisMax>
-          <AxisMin>0</AxisMin>
-          <YAxisVisible>True</YAxisVisible>
-          <YShowMajorGridlines>true</YShowMajorGridlines>
-          <YShowMinorGridlines>false</YShowMinorGridlines>
-          <YShowInterlaceStrips>false</YShowInterlaceStrips>
-          <YShowSideMargin>true</YShowSideMargin>
-          <YAxisFont>Microsoft Sans Serif,8.25,Regular</YAxisFont>
-          <BackgroundColor1>-1</BackgroundColor1>
-          <BackgroundColor2>-1</BackgroundColor2>
-          <GradientType>None</GradientType>
-          <Series />
-        </Presentation>
-        <Target />
-      </View>
-      <View ID="View_85bff1eeeb3c40c99b88955568805ba5" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.PerformanceViewType" Visible="true">
-        <Category>Operations</Category>
-        <Criteria>
-          <RuleList>
-            <Rule>3abf12f7-ed3b-79c0-1b82-4ee5fbe65d22</Rule>
-          </RuleList>
-        </Criteria>
-        <Presentation>
-          <SortedColumnIndex>0</SortedColumnIndex>
-          <SortOrder>0</SortOrder>
-          <StartTime>2015-11-25T11:41:05.0586602+03:00</StartTime>
-          <EndTime>2015-11-26T11:41:05.0586602+03:00</EndTime>
-          <DynamicTimeTicks>864000000000</DynamicTimeTicks>
-          <IsDynamic>true</IsDynamic>
-          <Is3DMode>false</Is3DMode>
-          <ShowAlerts>false</ShowAlerts>
-          <ShowMaintenanceMode>false</ShowMaintenanceMode>
-          <BaselineMode>false</BaselineMode>
-          <ShowPointLabels>false</ShowPointLabels>
-          <EnableSmartLabels>true</EnableSmartLabels>
-          <RightAngleAxes>false</RightAngleAxes>
-          <ClusterSeries>false</ClusterSeries>
-          <Title />
-          <TitleFont>Microsoft Sans Serif,12,Regular</TitleFont>
-          <ChartFont>Microsoft Sans Serif,8.25,Regular</ChartFont>
-          <ShowBands>false</ShowBands>
-          <BandColor>-1579033</BandColor>
-          <ChartType>Line</ChartType>
-          <Depth>100</Depth>
-          <GapDepth>100</GapDepth>
-          <Perspective>10</Perspective>
-          <GraphXRotation>0</GraphXRotation>
-          <GraphYRotation>0</GraphYRotation>
-          <XLabelAngle>0</XLabelAngle>
-          <LabelColor>-16777216</LabelColor>
-          <LabelFont>Microsoft Sans Serif,8.25,Regular</LabelFont>
-          <XAxisVisible>True</XAxisVisible>
-          <XShowMajorGridlines>false</XShowMajorGridlines>
-          <XShowMinorGridlines>false</XShowMinorGridlines>
-          <ShowInterlaceStrips>false</ShowInterlaceStrips>
-          <XInterlaceColor>16777215</XInterlaceColor>
-          <XShowSideMargin>true</XShowSideMargin>
-          <XAxisFont>Microsoft Sans Serif,8.25,Regular</XAxisFont>
-          <AutoAxis>true</AutoAxis>
-          <AxisMax>100</AxisMax>
-          <AxisMin>0</AxisMin>
-          <YAxisVisible>True</YAxisVisible>
-          <YShowMajorGridlines>true</YShowMajorGridlines>
-          <YShowMinorGridlines>false</YShowMinorGridlines>
-          <YShowInterlaceStrips>false</YShowInterlaceStrips>
-          <YShowSideMargin>true</YShowSideMargin>
-          <YAxisFont>Microsoft Sans Serif,8.25,Regular</YAxisFont>
-          <BackgroundColor1>-1</BackgroundColor1>
-          <BackgroundColor2>-1</BackgroundColor2>
-          <GradientType>None</GradientType>
-          <Series />
-        </Presentation>
-        <Target />
-      </View>
-      <View ID="View_e57d3e1f9366480eb4a25b339111a2a4" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.DataBase" TypeID="SC!Microsoft.SystemCenter.AlertViewType" Visible="true">
+      <View ID="View_7573e080532448ecbe56e1d3f7aba457" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.AlertViewType" Visible="true">
         <Category>Operations</Category>
         <Criteria />
         <Presentation>
@@ -1542,465 +2079,594 @@ Call oAPI.Return(oBag)
             <Id>TfsWorkItemOwner</Id>
           </ColumnInfo>
         </Presentation>
-        <Target />
+        <Target>da27989d-a646-d3cf-d3ab-502987daadf1</Target>
       </View>
-      <View ID="View_5368fc064c014c72b74c96a6f42ff301" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.Table" TypeID="SC!Microsoft.SystemCenter.AlertViewType" Visible="true">
+      <View ID="View_74812baa8f5246e8b08a72dbcff5c4f6" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.PerformanceViewType" Visible="true">
         <Category>Operations</Category>
-        <Criteria />
+        <Criteria>
+          <RuleList>
+            <Rule>868b3d88-d03f-61c7-b4b5-94384d5d2ca5</Rule>
+          </RuleList>
+        </Criteria>
         <Presentation>
-          <ColumnInfo Index="0" SortIndex="0" Width="22" Grouped="true" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Severity</Name>
-            <Id>Severity</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="1" SortIndex="-1" Width="54" Grouped="false" Sorted="false" IsSortable="false" Visible="true" SortOrder="Ascending">
-            <Name>Icon</Name>
-            <Id>Icon</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Path</Name>
-            <Id>MonitoringObjectPath</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Source</Name>
-            <Id>MonitoringObjectDisplayName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="4" SortIndex="-1" Width="22" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Maintenance Mode</Name>
-            <Id>MonitoringObjectInMaintenanceMode</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="5" SortIndex="-1" Width="250" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Name</Name>
-            <Id>Name</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Resolution State</Name>
-            <Id>ResolutionState</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="7" SortIndex="-1" Width="150" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Created</Name>
-            <Id>TimeRaised</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="8" SortIndex="1" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Age</Name>
-            <Id>Age</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="9" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Type</Name>
-            <Id>Category</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="10" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Owner</Name>
-            <Id>Owner</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="11" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Priority</Name>
-            <Id>Priority</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="12" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Latency</Name>
-            <Id>Latency</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="13" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Description</Name>
-            <Id>Description</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="14" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Connector</Name>
-            <Id>ConnectorId</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="15" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Forwarding Status</Name>
-            <Id>ConnectorStatus</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="16" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Class</Name>
-            <Id>Class</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="17" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Time in State</Name>
-            <Id>TimeInState</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="18" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 1</Name>
-            <Id>CustomField1</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="19" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 2</Name>
-            <Id>CustomField2</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="20" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 3</Name>
-            <Id>CustomField3</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="21" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 4</Name>
-            <Id>CustomField4</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="22" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 5</Name>
-            <Id>CustomField5</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="23" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 6</Name>
-            <Id>CustomField6</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="24" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 7</Name>
-            <Id>CustomField7</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="25" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 8</Name>
-            <Id>CustomField8</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="26" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 9</Name>
-            <Id>CustomField9</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="27" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 10</Name>
-            <Id>CustomField10</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="28" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Resolved By</Name>
-            <Id>ResolvedBy</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="29" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Time Resolved</Name>
-            <Id>TimeResolved</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="30" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Last State Change</Name>
-            <Id>TimeResolutionStateLastModified</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="31" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Last Modified</Name>
-            <Id>LastModified</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="32" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Last Modified By</Name>
-            <Id>LastModifiedBy</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="33" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Management Group</Name>
-            <Id>ManagementGroup</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="34" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Site</Name>
-            <Id>SiteName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="35" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Repeat Count</Name>
-            <Id>RepeatCount</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="36" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Ticket ID</Name>
-            <Id>TicketId</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="37" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>TFS Work Item ID</Name>
-            <Id>TfsWorkItemId</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="38" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>TFS Work Item Owner</Name>
-            <Id>TfsWorkItemOwner</Id>
-          </ColumnInfo>
+          <SortedColumnIndex>0</SortedColumnIndex>
+          <SortOrder>0</SortOrder>
+          <StartTime>2016-05-23T11:39:10.435791+03:00</StartTime>
+          <EndTime>2016-05-24T11:39:10.435791+03:00</EndTime>
+          <DynamicTimeTicks>864000000000</DynamicTimeTicks>
+          <IsDynamic>true</IsDynamic>
+          <Is3DMode>false</Is3DMode>
+          <ShowAlerts>false</ShowAlerts>
+          <ShowMaintenanceMode>false</ShowMaintenanceMode>
+          <BaselineMode>false</BaselineMode>
+          <ShowPointLabels>false</ShowPointLabels>
+          <EnableSmartLabels>true</EnableSmartLabels>
+          <RightAngleAxes>false</RightAngleAxes>
+          <ClusterSeries>false</ClusterSeries>
+          <Title />
+          <TitleFont>Microsoft Sans Serif,12,Regular</TitleFont>
+          <ChartFont>Microsoft Sans Serif,8.25,Regular</ChartFont>
+          <ShowBands>false</ShowBands>
+          <BandColor>-1579033</BandColor>
+          <ChartType>Line</ChartType>
+          <Depth>100</Depth>
+          <GapDepth>100</GapDepth>
+          <Perspective>10</Perspective>
+          <GraphXRotation>0</GraphXRotation>
+          <GraphYRotation>0</GraphYRotation>
+          <XLabelAngle>0</XLabelAngle>
+          <LabelColor>-16777216</LabelColor>
+          <LabelFont>Microsoft Sans Serif,8.25,Regular</LabelFont>
+          <XAxisVisible>True</XAxisVisible>
+          <XShowMajorGridlines>false</XShowMajorGridlines>
+          <XShowMinorGridlines>false</XShowMinorGridlines>
+          <ShowInterlaceStrips>false</ShowInterlaceStrips>
+          <XInterlaceColor>16777215</XInterlaceColor>
+          <XShowSideMargin>true</XShowSideMargin>
+          <XAxisFont>Microsoft Sans Serif,8.25,Regular</XAxisFont>
+          <AutoAxis>true</AutoAxis>
+          <AxisMax>100</AxisMax>
+          <AxisMin>0</AxisMin>
+          <YAxisVisible>True</YAxisVisible>
+          <YShowMajorGridlines>true</YShowMajorGridlines>
+          <YShowMinorGridlines>false</YShowMinorGridlines>
+          <YShowInterlaceStrips>false</YShowInterlaceStrips>
+          <YShowSideMargin>true</YShowSideMargin>
+          <YAxisFont>Microsoft Sans Serif,8.25,Regular</YAxisFont>
+          <BackgroundColor1>-1</BackgroundColor1>
+          <BackgroundColor2>-1</BackgroundColor2>
+          <GradientType>None</GradientType>
+          <Series />
         </Presentation>
         <Target />
       </View>
-      <View ID="View_b730d16c551c4da0a2139d97a714456f" Accessibility="Public" Enabled="true" Target="PostgresMP.Windows.Application" TypeID="SC!Microsoft.SystemCenter.AlertViewType" Visible="true">
+      <View ID="View_947db043934b4b83bda8cbae9e8c2ebb" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.PerformanceViewType" Visible="true">
         <Category>Operations</Category>
-        <Criteria />
+        <Criteria>
+          <RuleList>
+            <Rule>c14a3ef3-77d9-66b0-39d9-e2c9da78297b</Rule>
+          </RuleList>
+        </Criteria>
         <Presentation>
-          <ColumnInfo Index="0" SortIndex="0" Width="22" Grouped="true" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Severity</Name>
-            <Id>Severity</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="1" SortIndex="-1" Width="54" Grouped="false" Sorted="false" IsSortable="false" Visible="true" SortOrder="Ascending">
-            <Name>Icon</Name>
-            <Id>Icon</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Path</Name>
-            <Id>MonitoringObjectPath</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Source</Name>
-            <Id>MonitoringObjectDisplayName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="4" SortIndex="-1" Width="22" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Maintenance Mode</Name>
-            <Id>MonitoringObjectInMaintenanceMode</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="5" SortIndex="-1" Width="250" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Name</Name>
-            <Id>Name</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Resolution State</Name>
-            <Id>ResolutionState</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="7" SortIndex="-1" Width="150" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Created</Name>
-            <Id>TimeRaised</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="8" SortIndex="1" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Ascending">
-            <Name>Age</Name>
-            <Id>Age</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="9" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Type</Name>
-            <Id>Category</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="10" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Owner</Name>
-            <Id>Owner</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="11" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Priority</Name>
-            <Id>Priority</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="12" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Latency</Name>
-            <Id>Latency</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="13" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Description</Name>
-            <Id>Description</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="14" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Connector</Name>
-            <Id>ConnectorId</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="15" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Forwarding Status</Name>
-            <Id>ConnectorStatus</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="16" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Class</Name>
-            <Id>Class</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="17" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Time in State</Name>
-            <Id>TimeInState</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="18" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 1</Name>
-            <Id>CustomField1</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="19" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 2</Name>
-            <Id>CustomField2</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="20" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 3</Name>
-            <Id>CustomField3</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="21" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 4</Name>
-            <Id>CustomField4</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="22" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 5</Name>
-            <Id>CustomField5</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="23" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 6</Name>
-            <Id>CustomField6</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="24" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 7</Name>
-            <Id>CustomField7</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="25" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 8</Name>
-            <Id>CustomField8</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="26" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 9</Name>
-            <Id>CustomField9</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="27" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Custom Field 10</Name>
-            <Id>CustomField10</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="28" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Resolved By</Name>
-            <Id>ResolvedBy</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="29" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Time Resolved</Name>
-            <Id>TimeResolved</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="30" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Last State Change</Name>
-            <Id>TimeResolutionStateLastModified</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="31" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Last Modified</Name>
-            <Id>LastModified</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="32" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Last Modified By</Name>
-            <Id>LastModifiedBy</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="33" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Management Group</Name>
-            <Id>ManagementGroup</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="34" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Site</Name>
-            <Id>SiteName</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="35" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Repeat Count</Name>
-            <Id>RepeatCount</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="36" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>Ticket ID</Name>
-            <Id>TicketId</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="37" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>TFS Work Item ID</Name>
-            <Id>TfsWorkItemId</Id>
-          </ColumnInfo>
-          <ColumnInfo Index="38" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
-            <Name>TFS Work Item Owner</Name>
-            <Id>TfsWorkItemOwner</Id>
-          </ColumnInfo>
+          <SortedColumnIndex>0</SortedColumnIndex>
+          <SortOrder>0</SortOrder>
+          <StartTime>2016-05-23T11:42:15.8905916+03:00</StartTime>
+          <EndTime>2016-05-24T11:42:15.8905916+03:00</EndTime>
+          <DynamicTimeTicks>864000000000</DynamicTimeTicks>
+          <IsDynamic>true</IsDynamic>
+          <Is3DMode>false</Is3DMode>
+          <ShowAlerts>false</ShowAlerts>
+          <ShowMaintenanceMode>false</ShowMaintenanceMode>
+          <BaselineMode>false</BaselineMode>
+          <ShowPointLabels>false</ShowPointLabels>
+          <EnableSmartLabels>true</EnableSmartLabels>
+          <RightAngleAxes>false</RightAngleAxes>
+          <ClusterSeries>false</ClusterSeries>
+          <Title />
+          <TitleFont>Microsoft Sans Serif,12,Regular</TitleFont>
+          <ChartFont>Microsoft Sans Serif,8.25,Regular</ChartFont>
+          <ShowBands>false</ShowBands>
+          <BandColor>-1579033</BandColor>
+          <ChartType>Line</ChartType>
+          <Depth>100</Depth>
+          <GapDepth>100</GapDepth>
+          <Perspective>10</Perspective>
+          <GraphXRotation>0</GraphXRotation>
+          <GraphYRotation>0</GraphYRotation>
+          <XLabelAngle>0</XLabelAngle>
+          <LabelColor>-16777216</LabelColor>
+          <LabelFont>Microsoft Sans Serif,8.25,Regular</LabelFont>
+          <XAxisVisible>True</XAxisVisible>
+          <XShowMajorGridlines>false</XShowMajorGridlines>
+          <XShowMinorGridlines>false</XShowMinorGridlines>
+          <ShowInterlaceStrips>false</ShowInterlaceStrips>
+          <XInterlaceColor>16777215</XInterlaceColor>
+          <XShowSideMargin>true</XShowSideMargin>
+          <XAxisFont>Microsoft Sans Serif,8.25,Regular</XAxisFont>
+          <AutoAxis>true</AutoAxis>
+          <AxisMax>100</AxisMax>
+          <AxisMin>0</AxisMin>
+          <YAxisVisible>True</YAxisVisible>
+          <YShowMajorGridlines>true</YShowMajorGridlines>
+          <YShowMinorGridlines>false</YShowMinorGridlines>
+          <YShowInterlaceStrips>false</YShowInterlaceStrips>
+          <YShowSideMargin>true</YShowSideMargin>
+          <YAxisFont>Microsoft Sans Serif,8.25,Regular</YAxisFont>
+          <BackgroundColor1>-1</BackgroundColor1>
+          <BackgroundColor2>-1</BackgroundColor2>
+          <GradientType>None</GradientType>
+          <Series />
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_bd537a2f37b447f9be8a512bf0981954" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.PerformanceViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <RuleList>
+            <Rule>ee25515c-f8a9-00c5-7ebc-06dc7ffac99d</Rule>
+          </RuleList>
+        </Criteria>
+        <Presentation>
+          <SortedColumnIndex>0</SortedColumnIndex>
+          <SortOrder>0</SortOrder>
+          <StartTime>2016-05-23T11:43:17.7155181+03:00</StartTime>
+          <EndTime>2016-05-24T11:43:17.7155181+03:00</EndTime>
+          <DynamicTimeTicks>864000000000</DynamicTimeTicks>
+          <IsDynamic>true</IsDynamic>
+          <Is3DMode>false</Is3DMode>
+          <ShowAlerts>false</ShowAlerts>
+          <ShowMaintenanceMode>false</ShowMaintenanceMode>
+          <BaselineMode>false</BaselineMode>
+          <ShowPointLabels>false</ShowPointLabels>
+          <EnableSmartLabels>true</EnableSmartLabels>
+          <RightAngleAxes>false</RightAngleAxes>
+          <ClusterSeries>false</ClusterSeries>
+          <Title />
+          <TitleFont>Microsoft Sans Serif,12,Regular</TitleFont>
+          <ChartFont>Microsoft Sans Serif,8.25,Regular</ChartFont>
+          <ShowBands>false</ShowBands>
+          <BandColor>-1579033</BandColor>
+          <ChartType>Line</ChartType>
+          <Depth>100</Depth>
+          <GapDepth>100</GapDepth>
+          <Perspective>10</Perspective>
+          <GraphXRotation>0</GraphXRotation>
+          <GraphYRotation>0</GraphYRotation>
+          <XLabelAngle>0</XLabelAngle>
+          <LabelColor>-16777216</LabelColor>
+          <LabelFont>Microsoft Sans Serif,8.25,Regular</LabelFont>
+          <XAxisVisible>True</XAxisVisible>
+          <XShowMajorGridlines>false</XShowMajorGridlines>
+          <XShowMinorGridlines>false</XShowMinorGridlines>
+          <ShowInterlaceStrips>false</ShowInterlaceStrips>
+          <XInterlaceColor>16777215</XInterlaceColor>
+          <XShowSideMargin>true</XShowSideMargin>
+          <XAxisFont>Microsoft Sans Serif,8.25,Regular</XAxisFont>
+          <AutoAxis>true</AutoAxis>
+          <AxisMax>100</AxisMax>
+          <AxisMin>0</AxisMin>
+          <YAxisVisible>True</YAxisVisible>
+          <YShowMajorGridlines>true</YShowMajorGridlines>
+          <YShowMinorGridlines>false</YShowMinorGridlines>
+          <YShowInterlaceStrips>false</YShowInterlaceStrips>
+          <YShowSideMargin>true</YShowSideMargin>
+          <YAxisFont>Microsoft Sans Serif,8.25,Regular</YAxisFont>
+          <BackgroundColor1>-1</BackgroundColor1>
+          <BackgroundColor2>-1</BackgroundColor2>
+          <GradientType>None</GradientType>
+          <Series />
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_87cee7c33399412d9db8dc6135ce8d4e" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.PerformanceViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <RuleList>
+            <Rule>4cab0da5-7eab-c2f0-1a24-b37fa45940dc</Rule>
+          </RuleList>
+        </Criteria>
+        <Presentation>
+          <SortedColumnIndex>0</SortedColumnIndex>
+          <SortOrder>0</SortOrder>
+          <StartTime>2016-05-23T11:44:17.9853613+03:00</StartTime>
+          <EndTime>2016-05-24T11:44:17.9853613+03:00</EndTime>
+          <DynamicTimeTicks>864000000000</DynamicTimeTicks>
+          <IsDynamic>true</IsDynamic>
+          <Is3DMode>false</Is3DMode>
+          <ShowAlerts>false</ShowAlerts>
+          <ShowMaintenanceMode>false</ShowMaintenanceMode>
+          <BaselineMode>false</BaselineMode>
+          <ShowPointLabels>false</ShowPointLabels>
+          <EnableSmartLabels>true</EnableSmartLabels>
+          <RightAngleAxes>false</RightAngleAxes>
+          <ClusterSeries>false</ClusterSeries>
+          <Title />
+          <TitleFont>Microsoft Sans Serif,12,Regular</TitleFont>
+          <ChartFont>Microsoft Sans Serif,8.25,Regular</ChartFont>
+          <ShowBands>false</ShowBands>
+          <BandColor>-1579033</BandColor>
+          <ChartType>Line</ChartType>
+          <Depth>100</Depth>
+          <GapDepth>100</GapDepth>
+          <Perspective>10</Perspective>
+          <GraphXRotation>0</GraphXRotation>
+          <GraphYRotation>0</GraphYRotation>
+          <XLabelAngle>0</XLabelAngle>
+          <LabelColor>-16777216</LabelColor>
+          <LabelFont>Microsoft Sans Serif,8.25,Regular</LabelFont>
+          <XAxisVisible>True</XAxisVisible>
+          <XShowMajorGridlines>false</XShowMajorGridlines>
+          <XShowMinorGridlines>false</XShowMinorGridlines>
+          <ShowInterlaceStrips>false</ShowInterlaceStrips>
+          <XInterlaceColor>16777215</XInterlaceColor>
+          <XShowSideMargin>true</XShowSideMargin>
+          <XAxisFont>Microsoft Sans Serif,8.25,Regular</XAxisFont>
+          <AutoAxis>true</AutoAxis>
+          <AxisMax>100</AxisMax>
+          <AxisMin>0</AxisMin>
+          <YAxisVisible>True</YAxisVisible>
+          <YShowMajorGridlines>true</YShowMajorGridlines>
+          <YShowMinorGridlines>false</YShowMinorGridlines>
+          <YShowInterlaceStrips>false</YShowInterlaceStrips>
+          <YShowSideMargin>true</YShowSideMargin>
+          <YAxisFont>Microsoft Sans Serif,8.25,Regular</YAxisFont>
+          <BackgroundColor1>-1</BackgroundColor1>
+          <BackgroundColor2>-1</BackgroundColor2>
+          <GradientType>None</GradientType>
+          <Series />
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_4538a48a9d8243a8a0d1e9b7ffe27157" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.PerformanceViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <RuleList>
+            <Rule>7eaa7a03-cf24-9150-bc36-25673413e162</Rule>
+          </RuleList>
+        </Criteria>
+        <Presentation>
+          <SortedColumnIndex>0</SortedColumnIndex>
+          <SortOrder>0</SortOrder>
+          <StartTime>2016-05-23T11:45:53.9994855+03:00</StartTime>
+          <EndTime>2016-05-24T11:45:53.9994855+03:00</EndTime>
+          <DynamicTimeTicks>864000000000</DynamicTimeTicks>
+          <IsDynamic>true</IsDynamic>
+          <Is3DMode>false</Is3DMode>
+          <ShowAlerts>false</ShowAlerts>
+          <ShowMaintenanceMode>false</ShowMaintenanceMode>
+          <BaselineMode>false</BaselineMode>
+          <ShowPointLabels>false</ShowPointLabels>
+          <EnableSmartLabels>true</EnableSmartLabels>
+          <RightAngleAxes>false</RightAngleAxes>
+          <ClusterSeries>false</ClusterSeries>
+          <Title />
+          <TitleFont>Microsoft Sans Serif,12,Regular</TitleFont>
+          <ChartFont>Microsoft Sans Serif,8.25,Regular</ChartFont>
+          <ShowBands>false</ShowBands>
+          <BandColor>-1579033</BandColor>
+          <ChartType>Line</ChartType>
+          <Depth>100</Depth>
+          <GapDepth>100</GapDepth>
+          <Perspective>10</Perspective>
+          <GraphXRotation>0</GraphXRotation>
+          <GraphYRotation>0</GraphYRotation>
+          <XLabelAngle>0</XLabelAngle>
+          <LabelColor>-16777216</LabelColor>
+          <LabelFont>Microsoft Sans Serif,8.25,Regular</LabelFont>
+          <XAxisVisible>True</XAxisVisible>
+          <XShowMajorGridlines>false</XShowMajorGridlines>
+          <XShowMinorGridlines>false</XShowMinorGridlines>
+          <ShowInterlaceStrips>false</ShowInterlaceStrips>
+          <XInterlaceColor>16777215</XInterlaceColor>
+          <XShowSideMargin>true</XShowSideMargin>
+          <XAxisFont>Microsoft Sans Serif,8.25,Regular</XAxisFont>
+          <AutoAxis>true</AutoAxis>
+          <AxisMax>100</AxisMax>
+          <AxisMin>0</AxisMin>
+          <YAxisVisible>True</YAxisVisible>
+          <YShowMajorGridlines>true</YShowMajorGridlines>
+          <YShowMinorGridlines>false</YShowMinorGridlines>
+          <YShowInterlaceStrips>false</YShowInterlaceStrips>
+          <YShowSideMargin>true</YShowSideMargin>
+          <YAxisFont>Microsoft Sans Serif,8.25,Regular</YAxisFont>
+          <BackgroundColor1>-1</BackgroundColor1>
+          <BackgroundColor2>-1</BackgroundColor2>
+          <GradientType>None</GradientType>
+          <Series />
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_020693707b7740e786d20d9b5b5c8b76" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.PerformanceViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <RuleList>
+            <Rule>cc9b1be8-e4b0-7215-8c9a-77c16631465b</Rule>
+          </RuleList>
+        </Criteria>
+        <Presentation>
+          <SortedColumnIndex>0</SortedColumnIndex>
+          <SortOrder>0</SortOrder>
+          <StartTime>2016-05-23T11:46:56.1854524+03:00</StartTime>
+          <EndTime>2016-05-24T11:46:56.1854524+03:00</EndTime>
+          <DynamicTimeTicks>864000000000</DynamicTimeTicks>
+          <IsDynamic>true</IsDynamic>
+          <Is3DMode>false</Is3DMode>
+          <ShowAlerts>false</ShowAlerts>
+          <ShowMaintenanceMode>false</ShowMaintenanceMode>
+          <BaselineMode>false</BaselineMode>
+          <ShowPointLabels>false</ShowPointLabels>
+          <EnableSmartLabels>true</EnableSmartLabels>
+          <RightAngleAxes>false</RightAngleAxes>
+          <ClusterSeries>false</ClusterSeries>
+          <Title />
+          <TitleFont>Microsoft Sans Serif,12,Regular</TitleFont>
+          <ChartFont>Microsoft Sans Serif,8.25,Regular</ChartFont>
+          <ShowBands>false</ShowBands>
+          <BandColor>-1579033</BandColor>
+          <ChartType>Line</ChartType>
+          <Depth>100</Depth>
+          <GapDepth>100</GapDepth>
+          <Perspective>10</Perspective>
+          <GraphXRotation>0</GraphXRotation>
+          <GraphYRotation>0</GraphYRotation>
+          <XLabelAngle>0</XLabelAngle>
+          <LabelColor>-16777216</LabelColor>
+          <LabelFont>Microsoft Sans Serif,8.25,Regular</LabelFont>
+          <XAxisVisible>True</XAxisVisible>
+          <XShowMajorGridlines>false</XShowMajorGridlines>
+          <XShowMinorGridlines>false</XShowMinorGridlines>
+          <ShowInterlaceStrips>false</ShowInterlaceStrips>
+          <XInterlaceColor>16777215</XInterlaceColor>
+          <XShowSideMargin>true</XShowSideMargin>
+          <XAxisFont>Microsoft Sans Serif,8.25,Regular</XAxisFont>
+          <AutoAxis>true</AutoAxis>
+          <AxisMax>100</AxisMax>
+          <AxisMin>0</AxisMin>
+          <YAxisVisible>True</YAxisVisible>
+          <YShowMajorGridlines>true</YShowMajorGridlines>
+          <YShowMinorGridlines>false</YShowMinorGridlines>
+          <YShowInterlaceStrips>false</YShowInterlaceStrips>
+          <YShowSideMargin>true</YShowSideMargin>
+          <YAxisFont>Microsoft Sans Serif,8.25,Regular</YAxisFont>
+          <BackgroundColor1>-1</BackgroundColor1>
+          <BackgroundColor2>-1</BackgroundColor2>
+          <GradientType>None</GradientType>
+          <Series />
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_6ea793acb58147b4a2009da6f9541a5d" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.PerformanceViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <RuleList>
+            <Rule>2ed63c94-63a0-f934-9490-3e9ca4b66452</Rule>
+          </RuleList>
+        </Criteria>
+        <Presentation>
+          <SortedColumnIndex>0</SortedColumnIndex>
+          <SortOrder>0</SortOrder>
+          <StartTime>2016-05-23T11:47:34.4878754+03:00</StartTime>
+          <EndTime>2016-05-24T11:47:34.4878754+03:00</EndTime>
+          <DynamicTimeTicks>864000000000</DynamicTimeTicks>
+          <IsDynamic>true</IsDynamic>
+          <Is3DMode>false</Is3DMode>
+          <ShowAlerts>false</ShowAlerts>
+          <ShowMaintenanceMode>false</ShowMaintenanceMode>
+          <BaselineMode>false</BaselineMode>
+          <ShowPointLabels>false</ShowPointLabels>
+          <EnableSmartLabels>true</EnableSmartLabels>
+          <RightAngleAxes>false</RightAngleAxes>
+          <ClusterSeries>false</ClusterSeries>
+          <Title />
+          <TitleFont>Microsoft Sans Serif,12,Regular</TitleFont>
+          <ChartFont>Microsoft Sans Serif,8.25,Regular</ChartFont>
+          <ShowBands>false</ShowBands>
+          <BandColor>-1579033</BandColor>
+          <ChartType>Line</ChartType>
+          <Depth>100</Depth>
+          <GapDepth>100</GapDepth>
+          <Perspective>10</Perspective>
+          <GraphXRotation>0</GraphXRotation>
+          <GraphYRotation>0</GraphYRotation>
+          <XLabelAngle>0</XLabelAngle>
+          <LabelColor>-16777216</LabelColor>
+          <LabelFont>Microsoft Sans Serif,8.25,Regular</LabelFont>
+          <XAxisVisible>True</XAxisVisible>
+          <XShowMajorGridlines>false</XShowMajorGridlines>
+          <XShowMinorGridlines>false</XShowMinorGridlines>
+          <ShowInterlaceStrips>false</ShowInterlaceStrips>
+          <XInterlaceColor>16777215</XInterlaceColor>
+          <XShowSideMargin>true</XShowSideMargin>
+          <XAxisFont>Microsoft Sans Serif,8.25,Regular</XAxisFont>
+          <AutoAxis>true</AutoAxis>
+          <AxisMax>100</AxisMax>
+          <AxisMin>0</AxisMin>
+          <YAxisVisible>True</YAxisVisible>
+          <YShowMajorGridlines>true</YShowMajorGridlines>
+          <YShowMinorGridlines>false</YShowMinorGridlines>
+          <YShowInterlaceStrips>false</YShowInterlaceStrips>
+          <YShowSideMargin>true</YShowSideMargin>
+          <YAxisFont>Microsoft Sans Serif,8.25,Regular</YAxisFont>
+          <BackgroundColor1>-1</BackgroundColor1>
+          <BackgroundColor2>-1</BackgroundColor2>
+          <GradientType>None</GradientType>
+          <Series />
+        </Presentation>
+        <Target />
+      </View>
+      <View ID="View_0e06e89af1244075817385c9df7e00a1" Accessibility="Public" Enabled="true" Target="System!System.Entity" TypeID="SC!Microsoft.SystemCenter.PerformanceViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <RuleList>
+            <Rule>4f67159c-881d-430e-d3f4-90e038d11ac9</Rule>
+          </RuleList>
+        </Criteria>
+        <Presentation>
+          <SortedColumnIndex>0</SortedColumnIndex>
+          <SortOrder>0</SortOrder>
+          <StartTime>2016-05-23T11:48:18.7476974+03:00</StartTime>
+          <EndTime>2016-05-24T11:48:18.7476974+03:00</EndTime>
+          <DynamicTimeTicks>864000000000</DynamicTimeTicks>
+          <IsDynamic>true</IsDynamic>
+          <Is3DMode>false</Is3DMode>
+          <ShowAlerts>false</ShowAlerts>
+          <ShowMaintenanceMode>false</ShowMaintenanceMode>
+          <BaselineMode>false</BaselineMode>
+          <ShowPointLabels>false</ShowPointLabels>
+          <EnableSmartLabels>true</EnableSmartLabels>
+          <RightAngleAxes>false</RightAngleAxes>
+          <ClusterSeries>false</ClusterSeries>
+          <Title />
+          <TitleFont>Microsoft Sans Serif,12,Regular</TitleFont>
+          <ChartFont>Microsoft Sans Serif,8.25,Regular</ChartFont>
+          <ShowBands>false</ShowBands>
+          <BandColor>-1579033</BandColor>
+          <ChartType>Line</ChartType>
+          <Depth>100</Depth>
+          <GapDepth>100</GapDepth>
+          <Perspective>10</Perspective>
+          <GraphXRotation>0</GraphXRotation>
+          <GraphYRotation>0</GraphYRotation>
+          <XLabelAngle>0</XLabelAngle>
+          <LabelColor>-16777216</LabelColor>
+          <LabelFont>Microsoft Sans Serif,8.25,Regular</LabelFont>
+          <XAxisVisible>True</XAxisVisible>
+          <XShowMajorGridlines>false</XShowMajorGridlines>
+          <XShowMinorGridlines>false</XShowMinorGridlines>
+          <ShowInterlaceStrips>false</ShowInterlaceStrips>
+          <XInterlaceColor>16777215</XInterlaceColor>
+          <XShowSideMargin>true</XShowSideMargin>
+          <XAxisFont>Microsoft Sans Serif,8.25,Regular</XAxisFont>
+          <AutoAxis>true</AutoAxis>
+          <AxisMax>100</AxisMax>
+          <AxisMin>0</AxisMin>
+          <YAxisVisible>True</YAxisVisible>
+          <YShowMajorGridlines>true</YShowMajorGridlines>
+          <YShowMinorGridlines>false</YShowMinorGridlines>
+          <YShowInterlaceStrips>false</YShowInterlaceStrips>
+          <YShowSideMargin>true</YShowSideMargin>
+          <YAxisFont>Microsoft Sans Serif,8.25,Regular</YAxisFont>
+          <BackgroundColor1>-1</BackgroundColor1>
+          <BackgroundColor2>-1</BackgroundColor2>
+          <GradientType>None</GradientType>
+          <Series />
         </Presentation>
         <Target />
       </View>
     </Views>
     <Folders>
-      <Folder ID="Folder_44dcd909385f4e21add332977bb8fc57" Accessibility="Public" ParentFolder="SC!Microsoft.SystemCenter.Monitoring.ViewFolder.Root" />
-      <Folder ID="Folder_00e626e8ef4c4543a1423b676c7996a4" Accessibility="Public" ParentFolder="Folder_44dcd909385f4e21add332977bb8fc57" />
-      <Folder ID="Folder_c1d4e15cd55545e6a302675482008259" Accessibility="Public" ParentFolder="Folder_00e626e8ef4c4543a1423b676c7996a4" />
-      <Folder ID="Folder_f857300309db48708525085ad7ffed76" Accessibility="Public" ParentFolder="Folder_44dcd909385f4e21add332977bb8fc57" />
+      <Folder ID="Folder_f1f1c124f702462c82ba0605cc9d2542" Accessibility="Public" ParentFolder="SC!Microsoft.SystemCenter.Monitoring.ViewFolder.Root" />
+      <Folder ID="Folder_fca2a6262f214746ae15a7d4065ce61c" Accessibility="Public" ParentFolder="Folder_f1f1c124f702462c82ba0605cc9d2542" />
+      <Folder ID="Folder_28eedb41f7954431af3382cad06e49f7" Accessibility="Public" ParentFolder="Folder_f1f1c124f702462c82ba0605cc9d2542" />
+      <Folder ID="Folder_f3c906a1b02044afbba9edd086ad2ead" Accessibility="Public" ParentFolder="Folder_fca2a6262f214746ae15a7d4065ce61c" />
+      <Folder ID="Folder_7e324d2806ab4e89a9a98bbe3906cdb4" Accessibility="Public" ParentFolder="Folder_28eedb41f7954431af3382cad06e49f7" />
     </Folders>
     <FolderItems>
-      <FolderItem ElementID="View_d0f8602482e547cfaeffcdabecb8244e" ID="i33130bfcafbd4e9086bc33eae7c11fe1" Folder="Folder_44dcd909385f4e21add332977bb8fc57" />
-      <FolderItem ElementID="View_7316caac01d94258853709ec43381cd2" ID="ia87d7e1bf2a844058693a68a1f4dd673" Folder="Folder_44dcd909385f4e21add332977bb8fc57" />
-      <FolderItem ElementID="View_7c4202f6b4154825b6050f9574edbd7c" ID="ie7b6bc976d104e3cbab52cdab94367d3" Folder="Folder_44dcd909385f4e21add332977bb8fc57" />
-      <FolderItem ElementID="View_f0661fb63db849109f7b78da839d9792" ID="id16dd74515f443c6aa490dbedb5066e6" Folder="Folder_00e626e8ef4c4543a1423b676c7996a4" />
-      <FolderItem ElementID="View_b23c6e6f42974ee9ba7ef600274761ec" ID="i97eccaa14b1b4557a4707b4b537d420c" Folder="Folder_c1d4e15cd55545e6a302675482008259" />
-      <FolderItem ElementID="View_08fe703af5e24aac97c4af4e4f8ac7bf" ID="iddc77d73c069420d91c2c049148d8c56" Folder="Folder_c1d4e15cd55545e6a302675482008259" />
-      <FolderItem ElementID="View_85bff1eeeb3c40c99b88955568805ba5" ID="i7812558017a04c0698b038e65350281c" Folder="Folder_c1d4e15cd55545e6a302675482008259" />
-      <FolderItem ElementID="View_e57d3e1f9366480eb4a25b339111a2a4" ID="ie8d2a64847834a729f253a9737dfc563" Folder="Folder_f857300309db48708525085ad7ffed76" />
-      <FolderItem ElementID="View_5368fc064c014c72b74c96a6f42ff301" ID="if51e7fc0fc42493599dfcbb0d250e518" Folder="Folder_f857300309db48708525085ad7ffed76" />
-      <FolderItem ElementID="View_b730d16c551c4da0a2139d97a714456f" ID="ie81fd190ed174286a83f7b3664880d45" Folder="Folder_f857300309db48708525085ad7ffed76" />
-      </FolderItems>
+      <FolderItem ElementID="View_f4c81b685ebe43cab2cedb6a68312582" ID="i8c57a8e013bd428b8c50eb3dfd2cfc60" Folder="Folder_fca2a6262f214746ae15a7d4065ce61c" />
+      <FolderItem ElementID="View_050702e0ea114b6cae65c1201be8d0f7" ID="i0a05502e592a411ebe6cafccb772001b" Folder="Folder_fca2a6262f214746ae15a7d4065ce61c" />
+      <FolderItem ElementID="View_ceb77ca680dc4d1093e14c0fb2647976" ID="i70cd9b37edb5474ab96e452214bf25dd" Folder="Folder_fca2a6262f214746ae15a7d4065ce61c" />
+      <FolderItem ElementID="View_5e3e99cf175e40b091a5b86d2d18ef7c" ID="i4f589ba2ec1e4572b1c6f46ec9b1bd39" Folder="Folder_28eedb41f7954431af3382cad06e49f7" />
+      <FolderItem ElementID="View_5669dacf93904b9db68390c42164362b" ID="i95ccfb018d00431482f2e603567ffd0e" Folder="Folder_28eedb41f7954431af3382cad06e49f7" />
+      <FolderItem ElementID="View_90d66804e6d64705b6310850d02e15f7" ID="i910ad61d066c4fb1a43a21975214a0b2" Folder="Folder_28eedb41f7954431af3382cad06e49f7" />
+      <FolderItem ElementID="View_7573e080532448ecbe56e1d3f7aba457" ID="i2421a4a4641e4e30b1990f80fc10883c" Folder="Folder_f1f1c124f702462c82ba0605cc9d2542" />
+      <FolderItem ElementID="View_74812baa8f5246e8b08a72dbcff5c4f6" ID="i8b712a97ab1d4f81868577753bfe4fdb" Folder="Folder_f3c906a1b02044afbba9edd086ad2ead" />
+      <FolderItem ElementID="View_947db043934b4b83bda8cbae9e8c2ebb" ID="id1985281da6c486cb6fad88ae0c6e305" Folder="Folder_f3c906a1b02044afbba9edd086ad2ead" />
+      <FolderItem ElementID="View_bd537a2f37b447f9be8a512bf0981954" ID="i39aede9a48fc49ed9fc6adb4552a9248" Folder="Folder_f3c906a1b02044afbba9edd086ad2ead" />
+      <FolderItem ElementID="View_87cee7c33399412d9db8dc6135ce8d4e" ID="ie7c2d26fcee7418ba001e01b9116f902" Folder="Folder_f3c906a1b02044afbba9edd086ad2ead" />
+      <FolderItem ElementID="View_4538a48a9d8243a8a0d1e9b7ffe27157" ID="i5ae92b4d78524b83ac97b72c8992e8ec" Folder="Folder_7e324d2806ab4e89a9a98bbe3906cdb4" />
+      <FolderItem ElementID="View_020693707b7740e786d20d9b5b5c8b76" ID="i5d1136e2796a463a9f66a373f966b1d8" Folder="Folder_7e324d2806ab4e89a9a98bbe3906cdb4" />
+      <FolderItem ElementID="View_6ea793acb58147b4a2009da6f9541a5d" ID="i2e339e818f6f4028b87b0639f6911d50" Folder="Folder_7e324d2806ab4e89a9a98bbe3906cdb4" />
+      <FolderItem ElementID="View_0e06e89af1244075817385c9df7e00a1" ID="id7df9ff37f844c8ebc612751f97acaa3" Folder="Folder_7e324d2806ab4e89a9a98bbe3906cdb4" />
+    </FolderItems>
     <StringResources>
-      <StringResource ID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9_AlertMessageResourceID" />
       <StringResource ID="PostgreMP.Windows.TransactionsMonitor_AlertMessageResourceID" />
       <StringResource ID="PostgreMP.Windows.VacuumMonitor_AlertMessageResourceID" />
       <StringResource ID="PostgreMP.Windows.CacheHitMonitor_AlertMessageResourceID" />
       <StringResource ID="PostgreMP.Windows.ConAvaliableMonitor_AlertMessageResourceID" />
       <StringResource ID="PostgreMP.Windows.DBConnectionsMonitor_AlertMessageResourceID" />
+      <StringResource ID="PostgresMP.Unix.ConnectionAvaliableMonitor.AlertMessage" />
+      <StringResource ID="PostgresMP.Unix.TransactionPercent.AlertMessage" />
+      <StringResource ID="PostgresMP.Unix.CacheHitPercent.AlertMessage" />
+      <StringResource ID="PostgresMP.Unix.DataBaseConnections.AlertMessage" />
+      <StringResource ID="PostgresMP.Unix.TableIndexHit.AlertMessage" />
+      <StringResource ID="PostgresMP.Unix.Autovacuum.AlertMessage" />
+      <StringResource ID="PostgresMP.Windows.TableIndexMonitor_AlertMessageResourceID" />
     </StringResources>
   </Presentation>
   <LanguagePacks>
-    <LanguagePack ID="RUS" IsDefault="true">
+    <LanguagePack ID="RUS" IsDefault="false">
       <DisplayStrings>
         <DisplayString ElementID="PostgreSQLMP">
           <Name>PostgreSQLMP</Name>
-          <Description>Пакет управления СУБД PostgreSQL</Description>
+          <Description>Пакет управления для СУБД PostgreSQL</Description>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.Application">
-          <Name>Postgres Application</Name>
-          <Description>приложение PostgreSQL</Description>
+          <Name>PostgresMP.Windows.Application</Name>
+          <Description>Приложение СУБД PostgreSQL на Windows компьютере</Description>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.Application" SubElementID="Info">
-          <Name>Инфо</Name>
+          <Name>Информация</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.Application" SubElementID="Driver">
+          <Name>Драйвер</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Application">
+          <Name>PostgresMP.Unix.Application</Name>
+          <Description>Приложение СУБД PostgreSQL на Unix компьютере</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Application" SubElementID="Info">
+          <Name>Информация</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Application" SubElementID="psqlPath">
+          <Name>Путь до psql</Name>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.DataBase">
-          <Name>Postgres dataBase</Name>
-          <Description>База данных PostgreSQL</Description>
+          <Name>PostgresMP.Windows.DataBase</Name>
+          <Description>База данных PostgreSQL на Windows компьютере</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgresMP.Windows.DataBase" SubElementID="Dbname">
-          <Name>Название БД</Name>
+        <DisplayString ElementID="PostgresMP.Windows.DataBase" SubElementID="DBName">
+          <Name>Название</Name>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.DataBase" SubElementID="hostName">
           <Name>Имя хоста</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgresMP.Windows.Table">
-          <Name>Postgres Table</Name>
-          <Description>Таблицы СУБД PostgreSQL</Description>
+        <DisplayString ElementID="PostgresMP.Unix.DataBase">
+          <Name>PostgresMP.Unix.DataBase</Name>
+          <Description>База данных PostgreSQL на Unix компьютере</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgresMP.Windows.Table" SubElementID="Dbname">
-          <Name>название БД</Name>
+        <DisplayString ElementID="PostgresMP.Unix.DataBase" SubElementID="DBName">
+          <Name>Название</Name>
         </DisplayString>
-        <DisplayString ElementID="PostgresMP.Windows.Table" SubElementID="TableName">
-          <Name>Имя таблицы</Name>
-        </DisplayString>
-        <DisplayString ElementID="PostgresMP.Windows.DataBaseDiscovery">
-          <Name>PostgreSQLMP dbDiscovery</Name>
-          <Description>dbDiscovery Description</Description>
-        </DisplayString>
-        <DisplayString ElementID="View_7316caac01d94258853709ec43381cd2">
-          <Name>СУБД PostgreSQL</Name>
-        </DisplayString>
-        <DisplayString ElementID="View_d0f8602482e547cfaeffcdabecb8244e">
-          <Name>Базы Данных</Name>
-        </DisplayString>
-        <DisplayString ElementID="View_7c4202f6b4154825b6050f9574edbd7c">
-          <Name>Таблицы</Name>
-        </DisplayString>
-      </DisplayStrings>
-    </LanguagePack>
-    <LanguagePack ID="ENU" IsDefault="false">
-      <DisplayStrings>
-        <DisplayString ElementID="PostgreSQLMP">
-          <Name>PostgreSQLMP</Name>
-          <Description>ManagementPack for PostgreSQL</Description>
-        </DisplayString>
-        <DisplayString ElementID="PostgresMP.Windows.Application">
-          <Name>Postgres Application</Name>
-          <Description>Application PostgreSQL</Description>
-        </DisplayString>
-        <DisplayString ElementID="PostgresMP.Windows.Application" SubElementID="Info">
-          <Name>Info</Name>
-        </DisplayString>
-        <DisplayString ElementID="PostgresMP.Windows.DataBase">
-          <Name>Postgres dataBase</Name>
-          <Description>DataBase PostgreSQL</Description>
-        </DisplayString>
-        <DisplayString ElementID="PostgresMP.Windows.DataBase" SubElementID="Dbname">
-          <Name>Name</Name>
-        </DisplayString>
-        <DisplayString ElementID="PostgresMP.Windows.DataBase" SubElementID="hostName">
-          <Name>Host name</Name>
+        <DisplayString ElementID="PostgresMP.Unix.DataBase" SubElementID="hostName">
+          <Name>Имя хоста</Name>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.Table">
-          <Name>Postgres Table</Name>
-          <Description>Tables of PostgreSQL</Description>
+          <Name>PostgresMP.Windows.Table</Name>
+          <Description>Таблица СУБД PostgreSQL на Windows компьютере</Description>
         </DisplayString>
-        <DisplayString ElementID="PostgresMP.Windows.Table" SubElementID="Dbname">
-          <Name>DataBase Name</Name>
+        <DisplayString ElementID="PostgresMP.Windows.Table" SubElementID="DBName">
+          <Name>Название базы данных</Name>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.Table" SubElementID="TableName">
-          <Name>Name</Name>
+          <Name>Название таблицы</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Table">
+          <Name>PostgresMP.Unix.Table</Name>
+          <Description>Таблица СУБД PostgreSQL на Unix компьютере</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Table" SubElementID="DBName">
+          <Name>Название базы данных</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Table" SubElementID="TableName">
+          <Name>Название таблицы</Name>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.DataBaseDiscovery">
-          <Name>PostgreSQLMP dbDiscovery</Name>
-          <Description>dbDiscovery Description</Description>
-        </DisplayString>
-        <DisplayString ElementID="Folder_44dcd909385f4e21add332977bb8fc57">
-          <Name>Postgres</Name>
-        </DisplayString>
-        <DisplayString ElementID="View_d0f8602482e547cfaeffcdabecb8244e">
-          <Name>DataBases</Name>
-        </DisplayString>
-        <DisplayString ElementID="View_7316caac01d94258853709ec43381cd2">
-          <Name>PostgreSQL</Name>
-        </DisplayString>
-        <DisplayString ElementID="UIGeneratedMonitor16b0af6439ba45b6bc0422512ae590b9_AlertMessageResourceID">
-          <Name>testdb</Name>
-          <Description>Percent:{0}
-State:{1}</Description>
+          <Name>PostgreSQLMP Дискавери баз данных</Name>
+          <Description>Поикс баз данных</Description>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.TransactionsMonitor">
-          <Name>TransactionsPercent</Name>
-          <Description>Percent of transactions that are success</Description>
+          <Name>Монитор процента удачных транзакций</Name>
+          <Description>Наблюдение за процентом удачных транзакций</Description>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.TransactionsMonitor" SubElementID="UIGeneratedOpStateId4b3cbd780c314262aa7bd5a171c28d94">
           <Name>Degraded</Name>
@@ -2013,14 +2679,14 @@ State:{1}</Description>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.TransactionsMonitor_AlertMessageResourceID">
           <Name>TransactionsPercent</Name>
-          <Description>{0}</Description>
+          <Description>Процент удачных транзакций на {0} в {1} достаточно мал. Процент = {2}</Description>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.ApplDiscovery">
           <Name>PostgreMP.Windows.ApplDiscovery</Name>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.VacuumMonitor">
-          <Name>AutovacuumConfig</Name>
-          <Description>Autovacuum enabled?</Description>
+          <Name>Autovacuum Monitor</Name>
+          <Description>Включен ли автовакуум</Description>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.VacuumMonitor" SubElementID="UIGeneratedOpStateId8ee2f5725ffe4316b46b6c5591fdd4f4">
           <Name>Healthy</Name>
@@ -2030,11 +2696,11 @@ State:{1}</Description>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.VacuumMonitor_AlertMessageResourceID">
           <Name>AutovacuumConfig</Name>
-          <Description>AUTOVACUUM IS OFF!!!!!!</Description>
+          <Description>Автовакуум на {0} ВЫКЛЮЧЕН.</Description>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.CacheHitMonitor">
-          <Name>CacheHit</Name>
-          <Description>cache rit monitoring</Description>
+          <Name>PostgreMP.Windows.CacheHit Percent Monitor</Name>
+          <Description>Наблюдение за попаданием в кеш</Description>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.CacheHitMonitor" SubElementID="UIGeneratedOpStateId8a78a5d8444a461cbf5c9a5ada42ef0f">
           <Name>Degraded</Name>
@@ -2047,13 +2713,11 @@ State:{1}</Description>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.CacheHitMonitor_AlertMessageResourceID">
           <Name>CacheHit</Name>
-          <Description>Cache hit of data base {0} on machine {1} is bad: Value = {2}</Description>
-        </DisplayString>
-        <DisplayString ElementID="View_7c4202f6b4154825b6050f9574edbd7c">
-          <Name>Tables</Name>
+          <Description>Процент пападаний в кеш в базе данных {0} на компьютере {1} низок: Значение = {2}</Description>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.TableIndexMonitor">
-          <Name>IndexHit</Name>
+          <Name>PostgresMP.Windows.TableIndexMonitor</Name>
+          <Description>Наблюдение за индексами в таблице</Description>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.TableIndexMonitor" SubElementID="UIGeneratedOpStateId9ba75359a41940089a81d4ceffc961ed">
           <Name>Unhealthy</Name>
@@ -2061,15 +2725,9 @@ State:{1}</Description>
         <DisplayString ElementID="PostgresMP.Windows.TableIndexMonitor" SubElementID="UIGeneratedOpStateId5fd30d383cda4411bc246079ee3de226">
           <Name>Healthy</Name>
         </DisplayString>
-        <DisplayString ElementID="Folder_00e626e8ef4c4543a1423b676c7996a4">
-          <Name>perfomance</Name>
-        </DisplayString>
-        <DisplayString ElementID="View_f0661fb63db849109f7b78da839d9792">
-          <Name>diskSpace</Name>
-        </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.ConAvaliableMonitor">
-          <Name>Avaliable</Name>
-          <Description>Is postgres Avaliable?</Description>
+          <Name>PostgreMP.Windows.Connection Avaliable Monitor</Name>
+          <Description>Доступна ли СУБД на компьютере?</Description>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.ConAvaliableMonitor" SubElementID="UIGeneratedOpStateId62c390cb131249b8b4714636b504a89d">
           <Name>Unhealthy</Name>
@@ -2078,12 +2736,12 @@ State:{1}</Description>
           <Name>Healthy</Name>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.ConAvaliableMonitor_AlertMessageResourceID">
-          <Name>Postgres Is Not Avaliable</Name>
-          <Description>Can`t connect to postgres on {0}</Description>
+          <Name>СУБД PostgreSQL недоступна</Name>
+          <Description>Нету подключения к СУБД на компьютере {0}</Description>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.DBConnectionsMonitor">
-          <Name>dataBaseConnections</Name>
-          <Description>desc</Description>
+          <Name>PostgreMP.Windows.Кол-во подключений к базам данных</Name>
+          <Description>Количество подключений к базам данных</Description>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.DBConnectionsMonitor" SubElementID="UIGeneratedOpStateId292807569fb54394b429568a04ed2f0b">
           <Name>Healthy</Name>
@@ -2095,17 +2753,16 @@ State:{1}</Description>
           <Name>Degraded</Name>
         </DisplayString>
         <DisplayString ElementID="PostgreMP.Windows.DBConnectionsMonitor_AlertMessageResourceID">
-          <Name>Postgres dataBaseConnections</Name>
-          <Description>Postgres dataBase connections is in warning state
-Percent of connections = {0}</Description>
+          <Name>PostgreSQL Кол-во подлючений к БД</Name>
+          <Description>Пул подлючений к базе скоро подойдет к концу! Компьютер: {0} База данных: {1} Заполнен на: {2}%</Description>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.TableInsersRule">
-          <Name>Postgres Table Inserts</Name>
-          <Description>desc</Description>
+          <Name>Количество вставок в таблицу</Name>
+          <Description>Количество вставок в таблицу</Description>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.TableUpdatesRule">
-          <Name>Postgres Table Updates</Name>
-          <Description>desc</Description>
+          <Name>Количество апдейтов в таблице</Name>
+          <Description>Количество апдейтов в таблице</Description>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.TableInsersRule" SubElementID="DS">
           <Name>Script Performance Data Provider</Name>
@@ -2117,20 +2774,8 @@ Percent of connections = {0}</Description>
           <Name>Performance Data Collection Write Action</Name>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.TableDeletesRule">
-          <Name>Postgres Table Deletes</Name>
-          <Description>desc</Description>
-        </DisplayString>
-        <DisplayString ElementID="Folder_c1d4e15cd55545e6a302675482008259">
-          <Name>Tables</Name>
-        </DisplayString>
-        <DisplayString ElementID="View_b23c6e6f42974ee9ba7ef600274761ec">
-          <Name>Inserts</Name>
-        </DisplayString>
-        <DisplayString ElementID="View_08fe703af5e24aac97c4af4e4f8ac7bf">
-          <Name>Updates</Name>
-        </DisplayString>
-        <DisplayString ElementID="View_85bff1eeeb3c40c99b88955568805ba5">
-          <Name>Deletes</Name>
+          <Name>Количество удалений из таблицы</Name>
+          <Description>Количество удалений из таблицы</Description>
         </DisplayString>
         <DisplayString ElementID="PostgresMP.Windows.TableUpdatesRule" SubElementID="DS">
           <Name>Script Performance Data Provider</Name>
@@ -2150,27 +2795,580 @@ Percent of connections = {0}</Description>
         <DisplayString ElementID="PostgresMP.Windows.TableDeletesRule" SubElementID="WriteToDB">
           <Name>Performance Data Collection Write Action</Name>
         </DisplayString>
-        <DisplayString ElementID="Folder_f857300309db48708525085ad7ffed76">
-          <Name>Alerts</Name>
+        <DisplayString ElementID="PostgresMP.Windows.DBConnectionsRule">
+          <Name>Количество подключений к базам данных</Name>
+          <Description>Количество подключений к базам данных</Description>
         </DisplayString>
-		<DisplayString ElementID="PostgresMP.Windows.DBConnectionsRule">
-          <Name>Postgres Database CurrentConnections</Name>
-          <Description>desc</Description>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor.AlertMessage">
+          <Name>СУБД недоступна</Name>
+          <Description>Нет подключения к СУБД PostgreSQL на {0}</Description>
         </DisplayString>
-        <DisplayString ElementID="View_e57d3e1f9366480eb4a25b339111a2a4">
-          <Name>Databases</Name>
+        <DisplayString ElementID="PostgresMP.Unix.TransactionPercent.AlertMessage">
+          <Name>Процент удачных транзакций</Name>
+          <Description>Процент удачных транзакций достаточно мал. Компьютер-{0}; БД- {1} Процент- {2}</Description>
         </DisplayString>
-        <DisplayString ElementID="View_5368fc064c014c72b74c96a6f42ff301">
+        <DisplayString ElementID="PostgresMP.Unix.CacheHitPercent.AlertMessage">
+          <Name>Процент попаданий в кеш</Name>
+          <Description>Процент попаданий в кеш достаточно мал. Компьютер- {0} БД- {1} Процент- {2}</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnections.AlertMessage">
+          <Name>Количество подключений к БД</Name>
+          <Description>Пул подлючений к базе скоро подойдет к концу! Компьютер: {0} База данных: {1} Статус: {2}%</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Autovacuum.AlertMessage">
+          <Name>Автовакуум</Name>
+          <Description>Автовакуум на компьютере {0} ВЫКЛЮЧЕН!</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableIndexHit.AlertMessage">
+          <Name>Обращения по индексу</Name>
+          <Description>Процент обращений по индексу на компьютере {0} в базе данных {1} в таблице {2} достаточно мал - {3}%</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor">
+          <Name>Проверка возможности подключения</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor" SubElementID="StatusError">
+          <Name>StatusError</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor" SubElementID="StatusWarning">
+          <Name>StatusWarning</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor" SubElementID="StatusOK">
+          <Name>StatusOK</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule">
+          <Name>Postgres.Unix.Подключение к базам данных</Name>
+          <Description>Количество ёпПодключений к базам данных</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule" SubElementID="DS">
+          <Name>Script Performance Data Provider</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule" SubElementID="WriteToDW">
+          <Name>Performance data publisher</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule" SubElementID="WriteToDB">
+          <Name>Performance Data Collection Write Action</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableInsersRule">
+          <Name>Количество вставок в таблицу</Name>
+          <Description>Количество вставок в таблицу</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableInsersRule" SubElementID="DS">
+          <Name>Script Performance Data Provider</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableInsersRule" SubElementID="WriteToDW">
+          <Name>Performance data publisher</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableInsersRule" SubElementID="WriteToDB">
+          <Name>Performance Data Collection Write Action</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule">
+          <Name>Количество апдейтов в таблице</Name>
+          <Description>Количество апдейтов в таблице</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule" SubElementID="DS">
+          <Name>Script Performance Data Provider</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule" SubElementID="WriteToDW">
+          <Name>Performance data publisher</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule" SubElementID="WriteToDB">
+          <Name>Performance Data Collection Write Action</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableDeletesRule">
+          <Name>Количество удалений из таблицы</Name>
+          <Description>Количество удалений из таблицы</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableDeletesRule" SubElementID="DS">
+          <Name>Script Performance Data Provider</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableDeletesRule" SubElementID="WriteToDW">
+          <Name>Performance data publisher</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableDeletesRule" SubElementID="WriteToDB">
+          <Name>Performance Data Collection Write Action</Name>
+        </DisplayString>
+        <DisplayString ElementID="Folder_f1f1c124f702462c82ba0605cc9d2542">
+          <Name>СУБД PostgreSQL</Name>
+        </DisplayString>
+        <DisplayString ElementID="Folder_fca2a6262f214746ae15a7d4065ce61c">
+          <Name>Unix</Name>
+        </DisplayString>
+        <DisplayString ElementID="Folder_28eedb41f7954431af3382cad06e49f7">
+          <Name>Windows</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_f4c81b685ebe43cab2cedb6a68312582">
+          <Name>Приложение PostgreSQL</Name>
+          <Description>СУБД Postgres на Unix компьютерах</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_050702e0ea114b6cae65c1201be8d0f7">
+          <Name>Базы данных</Name>
+          <Description>Базы данных Postgres на Unix компьютерах</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_ceb77ca680dc4d1093e14c0fb2647976">
+          <Name>Таблицы</Name>
+          <Description> Таблицы Postgres на Unix компьютерах</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_5e3e99cf175e40b091a5b86d2d18ef7c">
+          <Name>Приложение PostgreSQL</Name>
+          <Description>СУБД Postgres на Windows компьютерах</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_5669dacf93904b9db68390c42164362b">
+          <Name>Таблицы</Name>
+          <Description>Таблицы Postgres на Windows компьютерах</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_90d66804e6d64705b6310850d02e15f7">
+          <Name>Базы данных</Name>
+          <Description>Базы данных Postgres на Windows компьютерах</Description>
+        </DisplayString>
+        <DisplayString ElementID="UINameSpace8700a93c803749d0a03633fcb74f3922.Group">
+          <Name>PostgresMP.Group.All</Name>
+          <Description>Все обьекты пакета управления PostgreSQLMP</Description>
+        </DisplayString>
+        <DisplayString ElementID="UINameSpace8700a93c803749d0a03633fcb74f3922.Group.DiscoveryRule">
+          <Name>Populate PostgresMP.Group.All</Name>
+          <Description>Наполнитель группы 'PostgresMP.Group.All'</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_7573e080532448ecbe56e1d3f7aba457">
+          <Name>Предупреждения</Name>
+          <Description>All alerts of PostgreSQLMP</Description>
+        </DisplayString>
+        <DisplayString ElementID="Folder_f3c906a1b02044afbba9edd086ad2ead">
+          <Name>Графики</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_74812baa8f5246e8b08a72dbcff5c4f6">
+          <Name>Подлючения к БД</Name>
+          <Description>Количество текущих подключений к базам данных</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_947db043934b4b83bda8cbae9e8c2ebb">
+          <Name>Вставки в таблицы</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_bd537a2f37b447f9be8a512bf0981954">
+          <Name>Удаления из таблиц</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_87cee7c33399412d9db8dc6135ce8d4e">
+          <Name>Апдейты в таблицах</Name>
+        </DisplayString>
+        <DisplayString ElementID="Folder_7e324d2806ab4e89a9a98bbe3906cdb4">
+          <Name>Графики</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_4538a48a9d8243a8a0d1e9b7ffe27157">
+          <Name>Подлючения к БД</Name>
+          <Description>Количество текущих подключений к базам данных</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_020693707b7740e786d20d9b5b5c8b76">
+          <Name>Вставки в таблицы</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_6ea793acb58147b4a2009da6f9541a5d">
+          <Name>Удаления из таблиц</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_0e06e89af1244075817385c9df7e00a1">
+          <Name>Апдейты в таблицах</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnections">
+          <Name>PostgresMP.Unix.Монитор подключений к базам данных</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnections" SubElementID="StatusError">
+          <Name>StatusError</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnections" SubElementID="StatusWarning">
+          <Name>StatusWarning</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnections" SubElementID="StatusOK">
+          <Name>StatusOK</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableIndexMonitor_AlertMessageResourceID">
+          <Name>Обращения по индексу</Name>
+          <Description>Количество обращений по индексу на компьютере {0} в базе данных {1} в таблице {2} достаточно мало - {3}%</Description>
+        </DisplayString>
+	  </DisplayStrings>
+    </LanguagePack>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="PostgreSQLMP">
+          <Name>PostgreSQLMP</Name>
+          <Description>ManagementPack for PostgreSQL</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.Application">
+          <Name>PostgresMP.Windows.Application</Name>
+          <Description>Application PostgreSQL on Windows computer</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.Application" SubElementID="Info">
+          <Name>Info</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.Application" SubElementID="Driver">
+          <Name>Driver</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Application">
+          <Name>PostgresMP.Unix.Application</Name>
+          <Description>Application PostgreSQL on Unix computer</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Application" SubElementID="Info">
+          <Name>Info</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Application" SubElementID="psqlPath">
+          <Name>psqlPath</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.DataBase">
+          <Name>PostgresMP.Windows.DataBase</Name>
+          <Description>DataBase PostgreSQL on Windows computer</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.DataBase" SubElementID="DBName">
+          <Name>Name</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.DataBase" SubElementID="hostName">
+          <Name>Host name</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBase">
+          <Name>PostgresMP.Unix.DataBase</Name>
+          <Description>DataBase PostgreSQL on Unix computer</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBase" SubElementID="DBName">
+          <Name>Name</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBase" SubElementID="hostName">
+          <Name>Host name</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.Table">
+          <Name>PostgresMP.Windows.Table</Name>
+          <Description>Tables of PostgreSQL on Windows computer</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.Table" SubElementID="DBName">
+          <Name>DataBase Name</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.Table" SubElementID="TableName">
+          <Name>Name</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Table">
+          <Name>PostgresMP.Unix.Table</Name>
+          <Description>Tables of PostgreSQL on Unix computer</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Table" SubElementID="DBName">
+          <Name>DataBase Name</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Table" SubElementID="TableName">
+          <Name>Name</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.DataBaseDiscovery">
+          <Name>PostgreSQLMP dbDiscovery</Name>
+          <Description>dbDiscovery Description</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.TransactionsMonitor">
+          <Name>PostgreMP.Windows.Transactions Percent Monitor</Name>
+          <Description>Percent of transactions that are success</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.TransactionsMonitor" SubElementID="UIGeneratedOpStateId4b3cbd780c314262aa7bd5a171c28d94">
+          <Name>Degraded</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.TransactionsMonitor" SubElementID="UIGeneratedOpStateIdd4e29bb5e3c342ab86fb52ca9bb6f9a8">
+          <Name>Unhealthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.TransactionsMonitor" SubElementID="UIGeneratedOpStateId95c1b402dd034f81a92b97953df47def">
+          <Name>Healthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.TransactionsMonitor_AlertMessageResourceID">
+          <Name>TransactionsPercent</Name>
+          <Description>Successfull transaction percent on {0} in {1} is low ({2})</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.ApplDiscovery">
+          <Name>PostgreMP.Windows.ApplDiscovery</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.VacuumMonitor">
+          <Name>Autovacuum Monitor</Name>
+          <Description>Is Autovacuum enabled?</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.VacuumMonitor" SubElementID="UIGeneratedOpStateId8ee2f5725ffe4316b46b6c5591fdd4f4">
+          <Name>Healthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.VacuumMonitor" SubElementID="UIGeneratedOpStateId566ac2350eb6422ab1f32ebbd2e8f3fb">
+          <Name>Unhealthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.VacuumMonitor_AlertMessageResourceID">
+          <Name>AutovacuumConfig</Name>
+          <Description>Autovacuum on {0} is off</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.CacheHitMonitor">
+          <Name>PostgreMP.Windows.CacheHit Percent Monitor</Name>
+          <Description>Cache Hit monitoring</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.CacheHitMonitor" SubElementID="UIGeneratedOpStateId8a78a5d8444a461cbf5c9a5ada42ef0f">
+          <Name>Degraded</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.CacheHitMonitor" SubElementID="UIGeneratedOpStateId695a433cd83446d9aace7d252c8ffb28">
+          <Name>Unhealthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.CacheHitMonitor" SubElementID="UIGeneratedOpStateId1d3d38278d0048e58d92946032a4d86d">
+          <Name>Healthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.CacheHitMonitor_AlertMessageResourceID">
+          <Name>CacheHit</Name>
+          <Description>Cache hit of data base {0} on machine {1} is bad: Value = {2}</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableIndexMonitor">
+          <Name>PostgresMP.Windows.TableIndexMonitor</Name>
+          <Description>Table indexes monitor</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableIndexMonitor" SubElementID="UIGeneratedOpStateId9ba75359a41940089a81d4ceffc961ed">
+          <Name>Unhealthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableIndexMonitor" SubElementID="UIGeneratedOpStateId5fd30d383cda4411bc246079ee3de226">
+          <Name>Healthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.ConAvaliableMonitor">
+          <Name>PostgreMP.Windows.Connection Avaliable Monitor</Name>
+          <Description>Is postgres Avaliable?</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.ConAvaliableMonitor" SubElementID="UIGeneratedOpStateId62c390cb131249b8b4714636b504a89d">
+          <Name>Unhealthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.ConAvaliableMonitor" SubElementID="UIGeneratedOpStateId8b56c3772bda4ba1b14175de8e6ea025">
+          <Name>Healthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.ConAvaliableMonitor_AlertMessageResourceID">
+          <Name>Postgres Is Not Avaliable</Name>
+          <Description>Can`t connect to postgres on {0}</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.DBConnectionsMonitor">
+          <Name>PostgreMP.Windows.DBConnectionsMonitor</Name>
+          <Description>Postgres monitor for database connections</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.DBConnectionsMonitor" SubElementID="UIGeneratedOpStateId292807569fb54394b429568a04ed2f0b">
+          <Name>Healthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.DBConnectionsMonitor" SubElementID="UIGeneratedOpStateId03b2bed1151d4275ad865836dac9b11d">
+          <Name>Unhealthy</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.DBConnectionsMonitor" SubElementID="UIGeneratedOpStateIdbb0e6d06508148dda042bb211f0bb061">
+          <Name>Degraded</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgreMP.Windows.DBConnectionsMonitor_AlertMessageResourceID">
+          <Name>Postgres dataBaseConnections</Name>
+          <Description>Database connection pool is about to finish computer: {0} database: {1} status: {2}</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableInsersRule">
+          <Name>Postgres Table Inserts</Name>
+          <Description>Postgres Table Inserts Count</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableUpdatesRule">
+          <Name>Postgres Table Updates</Name>
+          <Description>Postgres Table Updates Count</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableInsersRule" SubElementID="DS">
+          <Name>Script Performance Data Provider</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableInsersRule" SubElementID="WriteToDW">
+          <Name>Performance data publisher</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableInsersRule" SubElementID="WriteToDB">
+          <Name>Performance Data Collection Write Action</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableDeletesRule">
+          <Name>Postgres Table Deletes</Name>
+          <Description>Postgres Table Deletes Count</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableUpdatesRule" SubElementID="DS">
+          <Name>Script Performance Data Provider</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableUpdatesRule" SubElementID="WriteToDW">
+          <Name>Performance data publisher</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableUpdatesRule" SubElementID="WriteToDB">
+          <Name>Performance Data Collection Write Action</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableDeletesRule" SubElementID="WriteToDW">
+          <Name>Performance data publisher</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableDeletesRule" SubElementID="DS">
+          <Name>Script Performance Data Provider</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableDeletesRule" SubElementID="WriteToDB">
+          <Name>Performance Data Collection Write Action</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.DBConnectionsRule">
+          <Name>Postgres Database Current Connections</Name>
+          <Description>Postgres Database Current Connections Count</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor.AlertMessage">
+          <Name>ApplicationAvaliable</Name>
+          <Description>No connection to PostgreSQL on {0}</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TransactionPercent.AlertMessage">
+          <Name>TransactionPercent</Name>
+          <Description>Successfull transaction percent on {0} in {1} is low ({2})</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.CacheHitPercent.AlertMessage">
+          <Name>CacheHitPercent</Name>
+          <Description>cachehit percent on {0} in {1} is low ({2})</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnections.AlertMessage">
+          <Name>DataBaseConnections</Name>
+          <Description>Database connection pool is about to finish computer: {0} database: {1} status: {2}</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.Autovacuum.AlertMessage">
+          <Name>Autovacuum</Name>
+          <Description>Autovacuum on {0} is off</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableIndexHit.AlertMessage">
+          <Name>TableIndexHit</Name>
+          <Description>Table Index Hit percent on {0} in database:{1} of table {2} is low ({3})</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor">
+          <Name>ConnectionAvaliable</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor" SubElementID="StatusError">
+          <Name>StatusError</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor" SubElementID="StatusWarning">
+          <Name>StatusWarning</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.ConnectionAvaliableMonitor" SubElementID="StatusOK">
+          <Name>StatusOK</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule">
+          <Name>PostgresUnixDBConnectionsRule</Name>
+          <Description>Postgres Unix Current Database Connections Rule</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule" SubElementID="DS">
+          <Name>Script Performance Data Provider</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule" SubElementID="WriteToDW">
+          <Name>Performance data publisher</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnectionsRule" SubElementID="WriteToDB">
+          <Name>Performance Data Collection Write Action</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableInsersRule">
+          <Name>PostgresUnixTableInsersRuleRule</Name>
+          <Description>Postgres Unix Table Inserts Count</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableInsersRule" SubElementID="DS">
+          <Name>Script Performance Data Provider</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableInsersRule" SubElementID="WriteToDW">
+          <Name>Performance data publisher</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableInsersRule" SubElementID="WriteToDB">
+          <Name>Performance Data Collection Write Action</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule">
+          <Name>PostgresUnixTableUpdatesRule</Name>
+          <Description>Postgres Unix Table Updates Count</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule" SubElementID="DS">
+          <Name>Script Performance Data Provider</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule" SubElementID="WriteToDW">
+          <Name>Performance data publisher</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableUpdatesRule" SubElementID="WriteToDB">
+          <Name>Performance Data Collection Write Action</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableDeletesRule">
+          <Name>PostgresUnixTableDeletesRule</Name>
+          <Description>Postgres Unix Table Deletes Count</Description>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableDeletesRule" SubElementID="DS">
+          <Name>Script Performance Data Provider</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableDeletesRule" SubElementID="WriteToDW">
+          <Name>Performance data publisher</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.TableDeletesRule" SubElementID="WriteToDB">
+          <Name>Performance Data Collection Write Action</Name>
+        </DisplayString>
+        <DisplayString ElementID="Folder_f1f1c124f702462c82ba0605cc9d2542">
+          <Name>PostgreSQL</Name>
+        </DisplayString>
+        <DisplayString ElementID="Folder_fca2a6262f214746ae15a7d4065ce61c">
+          <Name>Unix</Name>
+        </DisplayString>
+        <DisplayString ElementID="Folder_28eedb41f7954431af3382cad06e49f7">
+          <Name>Windows</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_f4c81b685ebe43cab2cedb6a68312582">
+          <Name>Applications</Name>
+          <Description>Postgres Unix Apllications</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_050702e0ea114b6cae65c1201be8d0f7">
+          <Name>DataBases</Name>
+          <Description>Postgres Unix Databases</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_ceb77ca680dc4d1093e14c0fb2647976">
           <Name>Tables</Name>
+          <Description>Postgres Unix Tables</Description>
         </DisplayString>
-        <DisplayString ElementID="View_b730d16c551c4da0a2139d97a714456f">
-          <Name>Postgres</Name>
+        <DisplayString ElementID="View_5e3e99cf175e40b091a5b86d2d18ef7c">
+          <Name>Applications</Name>
+          <Description>Postgres Windows Applications</Description>
         </DisplayString>
-        <DisplayString ElementID="UINameSpacee3eb748b35e04c07b0bd45ae339962f7.Group">
-          <Name>PostgresMP.Windows.ApplicationGroup</Name>
-          <Description>comment</Description>
+        <DisplayString ElementID="View_5669dacf93904b9db68390c42164362b">
+          <Name>Tables</Name>
+          <Description>Postgres Windows Tables</Description>
         </DisplayString>
-        </DisplayStrings>
+        <DisplayString ElementID="View_90d66804e6d64705b6310850d02e15f7">
+          <Name>DataBases</Name>
+          <Description>Postgres Windows Databases</Description>
+        </DisplayString>
+        <DisplayString ElementID="UINameSpace8700a93c803749d0a03633fcb74f3922.Group">
+          <Name>PostgresMP.Group.All</Name>
+          <Description>All objects of PostgreSQLMP</Description>
+        </DisplayString>
+        <DisplayString ElementID="UINameSpace8700a93c803749d0a03633fcb74f3922.Group.DiscoveryRule">
+          <Name>Populate PostgresMP.Group.All</Name>
+          <Description>This discovery rule populates the group 'PostgresMP.Group.All'</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_7573e080532448ecbe56e1d3f7aba457">
+          <Name>Alerts</Name>
+          <Description>All alerts of PostgreSQLMP</Description>
+        </DisplayString>
+        <DisplayString ElementID="Folder_f3c906a1b02044afbba9edd086ad2ead">
+          <Name>Grafics</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_74812baa8f5246e8b08a72dbcff5c4f6">
+          <Name>DataBase connections</Name>
+          <Description>Current database connections</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_947db043934b4b83bda8cbae9e8c2ebb">
+          <Name>Table Inserts</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_bd537a2f37b447f9be8a512bf0981954">
+          <Name>Table Deletes</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_87cee7c33399412d9db8dc6135ce8d4e">
+          <Name>Table Updates</Name>
+        </DisplayString>
+        <DisplayString ElementID="Folder_7e324d2806ab4e89a9a98bbe3906cdb4">
+          <Name>Grafics</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_4538a48a9d8243a8a0d1e9b7ffe27157">
+          <Name>DataBase connections</Name>
+          <Description>Current database connections</Description>
+        </DisplayString>
+        <DisplayString ElementID="View_020693707b7740e786d20d9b5b5c8b76">
+          <Name>Table Inserts</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_6ea793acb58147b4a2009da6f9541a5d">
+          <Name>Table Deletes</Name>
+        </DisplayString>
+        <DisplayString ElementID="View_0e06e89af1244075817385c9df7e00a1">
+          <Name>Table Updates</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnections">
+          <Name>PostgresMP.Unix.DatabaseConnectionsMon</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnections" SubElementID="StatusError">
+          <Name>StatusError</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnections" SubElementID="StatusWarning">
+          <Name>StatusWarning</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Unix.DataBaseConnections" SubElementID="StatusOK">
+          <Name>StatusOK</Name>
+        </DisplayString>
+        <DisplayString ElementID="PostgresMP.Windows.TableIndexMonitor_AlertMessageResourceID">
+          <Name>IndexHit percent</Name>
+          <Description>Table Index Hit percent on {0} in database: {1} of table {2} is low ( {3} %)</Description>
+        </DisplayString>
+      </DisplayStrings>
     </LanguagePack>
   </LanguagePacks>
 </ManagementPack>
